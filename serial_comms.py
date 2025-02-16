@@ -34,7 +34,6 @@ def delayed_call(duration: int):
 # ITEMS = ['Banana', 'Bomb', 'redShroom', 'goldShroom', 'redShell', 'blueShell', 'lightning', 'bulletBill']
 
 
-0 = Ping, 1 = AnchorDistances, 2 = PositionEstimate,
     # 3 = UseItem, 4 = RankingUpdate, 5 = GetItem, 6 = DoItem
 
 def driver():
