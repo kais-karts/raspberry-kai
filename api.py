@@ -19,15 +19,15 @@ def update_positions(positions: List[Position]) -> None:
     """
     pass
 
-ItemType = Literal["banana", "bomb-omb", "red_shroom", "lightning", "bullet_bill", "gold_shroom", "red_shell", "blue_shell"] 
-def item_pickup(item: ItemType) -> None:
+
+def item_pickup(item: int) -> None:
     """
     Updates the UI when a new item is picked up
     """
     socketio.emit('item_pickup', {'item': item})
 
 
-def item_hit(item: ItemType) -> None:
+def item_hit(item: int) -> None:
     """
     Updates UI when player is hit with item
     """

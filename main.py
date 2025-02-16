@@ -15,10 +15,10 @@ def flask():
 
 def man():
     while True:
-        for i in range(5):
+        for i in range(3):
             time.sleep(1)
             print(f"{i}s")
-        api.item_pickup("banana")
+        api.item_pickup(0)
 
 if __name__ == "__main__":
     threading.Thread(target=driver).start()  # Run main() in a different thread

@@ -24,7 +24,7 @@ Warning NO AUTO RELOAD
 ## API
 
 item_names = [
-"Banana" =0
+"Banana" = 0
 "Bomb" = 1
 "redShroom" = 2
 "goldShroom" = 3
@@ -51,12 +51,17 @@ def update_positions(positions: List[Position]) -> None:
 ### item_hit()
 
 ```
-def item_hit(positions: List[Position]) -> None:
+def item_hit(item: int) -> None:
     """
-    Updates positions of players on map takes in ordered list of racers with x,y positons 1st place in 0th index 2nd place in 1st etc...
+    Shows when player is hit with itme
     """
 ```
 
 ### item_pickup()
+
+def item_hit(item: int) -> None:
+"""
+Shows item player has received
+"""
 
 ### item_use()

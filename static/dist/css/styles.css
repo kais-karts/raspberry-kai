@@ -1,8 +1,11 @@
 .slideshow {
+  display: flex;
   width: 500px;
   height: 300px;
   position: relative;
   overflow: hidden;
+  justify-content: center;
+  align-items: center;
 }
 
 .slideshow img {
@@ -18,4 +21,11 @@
 
 .test {
   background-color: yellow;
+}
+
+.power-up {
+  max-height: 200px;
+  height: 200px;
+  width: auto;
+  object-fit: contain;
 }
