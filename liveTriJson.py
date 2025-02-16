@@ -1,12 +1,10 @@
 import numpy as np
 import cv2 as cv
-import serial
 import pickle
 from itertools import product
 import time
 from typing import Dict, Tuple, List, Optional
-import json
-import uuid
+from globals import *
 
 def circle_intersection(point: Tuple[int, int], radius: float, track_set: set) -> List[Tuple[int, int]]:
     """Find intersection points of a circle centered at 'point' with 'track'."""
@@ -70,59 +68,92 @@ def get_location(
         best_set = all_combinations[best_idx]
         location = tuple(np.mean(best_set, axis=0).astype(int))  # Compute average location
         return location
+    
+def recieve_anchors(data: dict) -> int:
+    # Expect data = {distances: [distance, ...]}
+    global TRACK_LIST, TRACK_SET, BEACONS, UPDATE_TIME, last_point, start_time
+    uwb_data = dict()
+    # Convert distances from cm to feet
+    for ix, distance in enumerate(data["distances"]):
+        uwb_data[ix] = distance * 0.03280841666667
 
-# Run the localization algorithm
-if __name__ == '__main__':
-    ser = serial.Serial('COM27', 9600)
+    location = get_location(uwb_data, TRACK_LIST, TRACK_SET, last_point, BEACONS)
+    last_point = location
+    print(location)
+    # find the index of location in the track_list
+    location_index = TRACK_LIST.index(location)
 
+    return location_index
+
+def init():
     # Load image and track data
-    track_list = pickle.load(open('ordered_points.pkl', 'rb'))
-    track_set = set(track_list)  # Create the set for fast lookup
+    global TRACK_LIST, TRACK_SET, BEACONS, UPDATE_TIME, last_point, start_time
+    TRACK_LIST = pickle.load(open('ordered_points.pkl', 'rb'))
+    TRACK_SET = set(TRACK_LIST)  # Create the set for fast lookup
 
     # Define beacons
-    beacons: Dict[str, Tuple[int, int]] = {
+    BEACONS: Dict[str, Tuple[int, int]] = {
         "0": (200, 27),  # y, x top left IN FOOT
         "1": (300, 30),  # mid
         "Beacon 3": (500, 27)   # left
     }
 
-    update_time = .1
+    UPDATE_TIME = .1
     last_point = None
     start_time = time.time()
 
-    while True:
-        # Read serial data 
-        try:
-            beacons_data = ser.readline().decode('utf-8').strip()
-            if not beacons_data:
-                continue
-            try:
-                uwb_data = json.loads(beacons_data)
-                # Convert distances from cm to feet
-                for key in uwb_data:
-                    uwb_data[key] = uwb_data[key] * 0.03280841666667
-            except json.JSONDecodeError:
-                continue
+# # Run the localization algorithm
+# if __name__ == '__main__':
+#     ser = serial.Serial('COM27', 9600)
 
-            location = get_location(uwb_data, track_list, track_set, last_point, beacons)
-            last_point = location
-            print(location)
-            # find the index of location in the track_list
-            location_index = track_list.index(location)
-            # send json PE data for location
-            data = {
-                "id": uuid.uuid4().int & (1<<32)-1,
-                "tags": "pe",
-                "args": {   
-                    "from": 0,
-                    "position": {
-                        "loc_index": location_index,
-                    }
-                }
-            }
-            ser.write(json.dumps(data).encode())
-        except KeyboardInterrupt:
-            break
+#     # Load image and track data
+#     track_list = pickle.load(open('ordered_points.pkl', 'rb'))
+#     track_set = set(track_list)  # Create the set for fast lookup
+
+#     # Define beacons
+#     beacons: Dict[str, Tuple[int, int]] = {
+#         "0": (200, 27),  # y, x top left IN FOOT
+#         "1": (300, 30),  # mid
+#         "Beacon 3": (500, 27)   # left
+#     }
+
+#     update_time = .1
+#     last_point = None
+#     start_time = time.time()
+
+#     while True:
+#         # Read serial data 
+#         try:
+#             beacons_data = ser.readline().decode('utf-8').strip()
+#             if not beacons_data:
+#                 continue
+#             try:
+#                 uwb_data = json.loads(beacons_data)
+#                 # Convert distances from cm to feet
+#                 for key in uwb_data:
+#                     uwb_data[key] = uwb_data[key] * 0.03280841666667
+#             except json.JSONDecodeError:
+#                 continue
+
+#             location = get_location(uwb_data, track_list, track_set, last_point, beacons)
+#             last_point = location
+#             print(location)
+#             # find the index of location in the track_list
+#             location_index = track_list.index(location)
+#             # send json PE data for location
+#             data = {
+#                 "id": uuid.uuid4().int & (1<<32)-1,
+#                 "tags": "pe",
+#                 "args": {   
+#                     "from": 0,
+#                     "position": {
+#                         "loc_index": location_index,
+#                     }
+#                 }
+#             }
+#             ser.write(json.dumps(data).encode())
+#         except KeyboardInterrupt:
+#             break
         
-cv.destroyAllWindows()
-ser.close()
+# cv.destroyAllWindows()
+# ser.close()

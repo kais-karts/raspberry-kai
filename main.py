@@ -2,6 +2,7 @@ from app import get_app, get_socket
 import api
 import threading
 import time
+from serial_comms import driver
 
 app = get_app()
 socketio = get_socket()
@@ -20,5 +21,5 @@ def man():
         api.item_pickup("banana")
 
 if __name__ == "__main__":
-    threading.Thread(target=man).start()  # Run main() in a different thread
+    threading.Thread(target=driver).start()  # Run main() in a different thread
     flask()  # Run flask() in the main thread
