@@ -1,8 +1,16 @@
 import numpy as np
-from flask import Flask, render_template
+from flask import Flask, request, render_template
+from flask_socketio import SocketIO 
+from flask_socketio import emit 
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
+
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
+def get_app(): return app
+def get_socket(): return socketio
 
 class Kart:
     def __init__(self, id, name, current_item, location):
@@ -86,5 +94,23 @@ def update_position(id, new_position):
     kart = [kart for kart in karts if kart.id == id][0]
     kart.location = new_position
 
-if __name__ == "__main__":
-    app.run(port=8000, debug=True)
+# Websockets
+
+
+
+# @app.route("/")
+# def index():
+#     return render_template("index.html")
+
+@socketio.on("connect")
+def handle_connect():
+    print("Client connected!")
+    socketio.emit("server_message", {"message": "Hello from Flask-SocketO!"})
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    print("Client disconnected!")
+
+
+# if __name__ == "__main__":
+#     socketio.run(app, port=8000, debug=True)

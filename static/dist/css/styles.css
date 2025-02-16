@@ -1,0 +1,21 @@
+.slideshow {
+  width: 500px;
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.slideshow img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: none;
+}
+
+.slideshow img.active {
+  display: block;
+}
+
+.test {
+  background-color: yellow;
+}
