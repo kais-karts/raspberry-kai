@@ -3,6 +3,17 @@ import api
 import threading
 import time
 
+item_names = [
+  "Banana",
+  "Bomb",
+  "redShroom",
+  "goldShroom",
+  "redShell",
+  "blueShell",
+  "lightning",
+  "bulletBill",
+]
+
 app = get_app()
 socketio = get_socket()
 
@@ -14,10 +25,12 @@ def flask():
 
 def main():
     while True:
-        for i in range(3):
-            time.sleep(1)
-            print(f"{i}s")
-        api.item_pickup(0)
+        for j in range(8):
+            for i in range(10):
+                time.sleep(1)
+                print(f"{i}s")
+            print(item_names[j])
+            api.item_pickup(j)
 
 if __name__ == "__main__":
     threading.Thread(target=main).start()  # Run main() in a different thread

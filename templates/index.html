@@ -18,67 +18,32 @@
     />
   </head>
   <body class="bg-gray-800 h-screen">
+    <div
+      id="warningDiv"
+      class="warning justify-center align-center"
+      style="
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <img src="static/power_ups/banana.webp" class="trap" alt="Banana" />
+      <img src="static/power_ups/bobomb.webp" class="trap" alt="Bomb" />
+      <img src="static/power_ups/mushroom.png" class="trap" alt="redShroom" />
+      <img
+        src="static/power_ups/goldmushroom.webp"
+        class="trap"
+        alt="goldShroom"
+      />
+      <img src="static/power_ups/redshell.webp" class="trap" alt="redShell" />
+      <img src="static/power_ups/blueshell.webp" class="trap" alt="blueShell" />
+      <img src="static/power_ups/bolt.png" class="trap" alt="lightning" />
+      <img src="static/power_ups/bill.webp" class="trap" alt="bulletBill" />
+    </div>
     <div class="container flex flex-row mx-auto px-4 py-20 h-full">
-      <div class="bg-green-800 h-full flex flex-1 flex-col">
-        <div class="bg-yellow-800 flex flex-1">
-          <div
-            class="countdown-container"
-            style="position: relative; width: 100%; height: 100%"
-          >
-            <canvas
-              id="countdownCanvas"
-              style="position: absolute; z-index: 10; width: 100%; height: 100%"
-            ></canvas>
-            <div
-              class="slideshow justify-center align-center bg-red-800"
-              style="width: 100%; height: 100%"
-            >
-              <img
-                src="static/power_ups/banana.webp"
-                class="power-up active"
-                alt="Banana"
-              />
-              <img
-                src="static/power_ups/bobomb.webp"
-                class="power-up active"
-                alt="Bomb"
-              />
-              <img
-                src="static/power_ups/mushroom.png"
-                class="power-up active"
-                alt="redShroom"
-              />
-              <img
-                src="static/power_ups/goldmushroom.webp"
-                class="power-up active"
-                alt="goldShroom"
-              />
-              <img
-                src="static/power_ups/redshell.webp"
-                class="power-up active"
-                alt="redShell"
-              />
-              <img
-                src="static/power_ups/blueshell.webp"
-                class="power-up active"
-                alt="blueShell"
-              />
-              <img
-                src="static/power_ups/shock.webp"
-                class="power-up active"
-                alt="lightning"
-              />
-              <img
-                src="static/power_ups/bill.webp"
-                class="power-up active"
-                alt="bulletBill"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="flex flex-1"></div>
-      </div>
-      <div class="bg-red-800 flex-1 h-full">
+      <div class="flex-1 h-full">
         <div class="w-2/3 relative h-full">
           <div class="relative w-full h-full">
             <img
@@ -116,6 +81,74 @@
             </div>
           </div>
           {% endfor %}
+        </div>
+      </div>
+      <div class="h-full flex flex-1 flex-col">
+        <!-- <div class="bg-yellow-800 flex flex-1"> -->
+        <div
+          class="countdown-container"
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+          "
+        >
+          <canvas
+            id="countdownCanvas"
+            width="400"
+            height="400"
+            style="position: absolute; z-index: 20"
+          ></canvas>
+          <div
+            class="slideshow justify-center align-center"
+            style="width: 100%; height: 100%"
+          >
+            <img
+              src="static/power_ups/banana.webp"
+              class="power-up"
+              alt="Banana"
+            />
+            <img
+              src="static/power_ups/bobomb.webp"
+              class="power-up"
+              alt="Bomb"
+            />
+            <img
+              src="static/power_ups/mushroom.png"
+              class="power-up"
+              alt="redShroom"
+            />
+            <img
+              src="static/power_ups/goldmushroom.webp"
+              class="power-up"
+              alt="goldShroom"
+            />
+            <img
+              src="static/power_ups/redshell.webp"
+              class="power-up"
+              alt="redShell"
+            />
+            <img
+              src="static/power_ups/blueshell.webp"
+              class="power-up"
+              alt="blueShell"
+            />
+            <img
+              src="static/power_ups/bolt.png"
+              class="power-up"
+              alt="lightning"
+            />
+            <img
+              src="static/power_ups/bill.webp"
+              class="power-up"
+              style="height: 170px; max-height: 170px"
+              alt="bulletBill"
+            />
+          </div>
+          <!-- </div> -->
         </div>
       </div>
     </div>
