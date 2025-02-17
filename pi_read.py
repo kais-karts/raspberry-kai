@@ -12,8 +12,9 @@ def handle_anchor_distances(data):
     Takes in distances to each anchor and returns the location index
     '''
     print("AnchorDistances:", data)
-    loc_index = recieve_anchors({'distances': data})
-    write_packet(build_position_estimate_packet(constvars.KART_ID, loc_index))
+    loc, loc_index = recieve_anchors({'distances': data})
+    x, y = loc
+    write_packet(build_position_estimate_packet(constvars.KART_ID, x, y,loc_index))
     return
 
 def handle_ranking_update(data):
@@ -124,9 +125,9 @@ def build_packet(tag, payload_bytes):
     packet += payload_bytes
     return packet
 
-def build_position_estimate_packet(from_val, loc_index):
+def build_position_estimate_packet(from_val, x, y, loc_index): #TODO: UPDATE ON ESP
     # tag 2
-    payload = struct.pack('<Ii', from_val, loc_index)
+    payload = struct.pack('<IIII', from_val, x, y, loc_index)
     return build_packet(2, payload)
 
 def build_use_item_packet(from_val, item, uid):
