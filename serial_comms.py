@@ -1,10 +1,11 @@
 from logging import getLogger
 import serial
 import constvars
-from pi_read import read_packet
-from speed_control import *
+from pi_read import read_packet, tests
 import liveTriJson as tri
 import globals
+import gpio_logic as io
+import time
 
 logger = getLogger("SerialReader")
 
@@ -19,6 +20,7 @@ def init():
 def driver():
     init()
     tri.init()
+    io.setup()
     while True:
         data = read_packet()
-        # TODO: time.sleep(0.1) to prevent busy loop?
+        time.sleep(0.01)

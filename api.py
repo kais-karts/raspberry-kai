@@ -31,13 +31,13 @@ def item_hit(item: int) -> None:
     """
     Updates UI when player is hit with item
     """
-    pass
+    socketio.emit('item_hit', {'item': item})
 
 def item_use(duration: float) -> None:
     """
     Updates UI when player uses an item
     """
-    pass
+    socketio.emit('item_use', {'duration': duration})
 
 
 

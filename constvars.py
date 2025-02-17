@@ -11,3 +11,16 @@ ITEM_DURATION = [3, 10, 3, 10, 5, 5, 5, 20] # (in seconds)
 ITEMS = ['Banana', 'Bomb', 'redShroom', 'goldShroom', 'redShell', 'blueShell', 'lightning', 'bulletBill']
 
 ITEM_SPEED = [0, 0, 2, 2, 0, 0, 1, 0]
+
+# Define the magic number (packet start marker)
+PACKET_START_MAGIC = 0xDEADBEEF
+
+# Define your GPIO pin numbers (adjust to your wiring)
+NORMAL_PIN = 5
+SLOW_PIN = 6
+STOP_PIN = 13
+
+KART_ID = 0
+
+BUTTON_IN, BUTTON_OUT= 5, 7
+
