@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+from typing import Optional
 
 # Define your GPIO pin numbers (adjust to your wiring)
 NORMAL_PIN = 5
@@ -37,3 +38,12 @@ def no_speed():
     GPIO.output(SLOW_PIN, GPIO.LOW)
     GPIO.output(STOP_PIN, GPIO.HIGH)
 
+def set_speed(speed: Optional[int]):
+    if speed == 0:
+        no_speed()
+    elif speed == 1:
+        slow_speed()
+    elif speed == 2:
+        full_speed()
+    else:
+        normal_speed()
