@@ -8,7 +8,7 @@ from globals import *
 
 def circle_intersection(point: Tuple[int, int], radius: float, track_set: set) -> List[Tuple[int, int]]:
     """Find intersection points of a circle centered at 'point' with 'track'."""
-    angles = np.linspace(0, 2 * np.pi, int(abs(radius * 10)))
+    angles = np.linspace(0, 2 * np.pi, int(abs(radius * 8)))
     x_points = np.round(point[1] + radius * np.cos(angles)).astype(int)
     y_points = np.round(point[0] + radius * np.sin(angles)).astype(int)
     circle_points = set(zip(x_points, y_points))
@@ -30,11 +30,11 @@ def get_location(
         beacon_position = beacons[beacon_name]
         track_intersection_points = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
 
-        if not track_intersection_points:
-            return None
-
         if last_point is None:
             return track_intersection_points[0]
+        
+        if not track_intersection_points:
+            return last_point
 
         # Find the closest intersection point to last_point
         best_point = min(track_intersection_points, key=lambda p: np.linalg.norm(np.array(p) - np.array(last_point)))
@@ -49,12 +49,9 @@ def get_location(
                 track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
-            return None  # Not enough intersection points to compute location
+            return last_point  # Not enough intersection points to compute location
 
         all_combinations = np.array(list(product(*track_intersection_points)))  # All possible combinations
-
-        if all_combinations.size == 0:
-            return None
 
         # Compute pairwise distances for each set
         diffs = all_combinations[:, :, np.newaxis, :] - all_combinations[:, np.newaxis, :, :]
@@ -71,7 +68,7 @@ def get_location(
     
 def recieve_anchors(data: dict) -> int:
     # Expect data = {distances: [distance, ...]}
-    global TRACK_LIST, TRACK_SET, BEACONS, UPDATE_TIME, last_point, start_time
+    global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
     uwb_data = dict()
     # Convert distances from cm to feet
     for ix, distance in enumerate(data["distances"]):
@@ -80,27 +77,35 @@ def recieve_anchors(data: dict) -> int:
     location = get_location(uwb_data, TRACK_LIST, TRACK_SET, last_point, BEACONS)
     last_point = location
     print(location)
-    # find the index of location in the track_list
-    location_index = TRACK_LIST.index(location)
+    # start and end track index and location
+    if inRect((0,100), (0, 500), location) or inRect((200,100), (200, 500), location):
+        #scaled distance of BRANCH_INFO["end_pos"]
+        distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
+        return int(BRANCH_INFO["start_idx"] + (distance_to_branch_end - BRANCH_INFO["max_dist"]) * (BRANCH_INFO["end_idx"] - BRANCH_INFO["start_idx"]) / -BRANCH_INFO["max_dist"])
+    else:
+        location_index = TRACK_LIST.index(location)
 
     return location_index
 
+def inRect(bottom_left, top_right, point):
+    return bottom_left[0] <= point[0] <= top_right[0] and bottom_left[1] <= point[1] <= top_right[1] 
+
 def init():
     # Load image and track data
-    global TRACK_LIST, TRACK_SET, BEACONS, UPDATE_TIME, last_point, start_time
+    global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
     TRACK_LIST = pickle.load(open('ordered_points.pkl', 'rb'))
     TRACK_SET = set(TRACK_LIST)  # Create the set for fast lookup
+    BRANCH_INFO = {"start_pos": (100,200), "start_idx": 800, "end_pos": (300,400), "end_idx": 1100}
+    BRANCH_INFO["max_dist"] = np.linalg.norm(np.array(BRANCH_INFO["start_pos"]) - np.array(BRANCH_INFO["end_pos"]))
 
-    # Define beacons
+    # Define beacons location
     BEACONS: Dict[str, Tuple[int, int]] = {
         "0": (200, 27),  # y, x top left IN FOOT
         "1": (300, 30),  # mid
         "Beacon 3": (500, 27)   # left
     }
 
-    UPDATE_TIME = .1
     last_point = None
-    start_time = time.time()
 
 # # Run the localization algorithm
 # if __name__ == '__main__':
