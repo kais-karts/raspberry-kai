@@ -3,6 +3,7 @@ from constvars import *
 import globals
 from liveTriJson import recieve_anchors
 from api import update_positions, item_pickup, item_hit, item_use
+from speed_control import speed_control
 
 def handle_anchor_distances(data):
     ''' 
@@ -10,43 +11,45 @@ def handle_anchor_distances(data):
     '''
     print("AnchorDistances:", data)
     loc_index = recieve_anchors({'distances': data})
-    write_packet(build_position_estimate_packet(KART_ID, loc_index))
+    write_packet(build_position_estimate_packet(globals.KART_ID, loc_index))
     return
 
 def handle_ranking_update(data):
     print("RankingUpdate:", data)
-    update_positions
+    update_positions(data["positions"])
     return
 
 def handle_get_item(data):
     print("GetItem:", data)
-    # Process get item here...
-    global CURRENT_PACKET
-    CURRENT_PACKET = data
+    kart_id = data['to']
+    item = data['item']
+    uid = data['uid']
+    if kart_id == globals.KART_ID and uid not in globals.seen_uids:
+        globals.seen_uids.add(uid)
+        item_pickup(item)
     return
 
 def handle_do_item(data):
     print("DoItem:", data)
-    global CURRENT_PACKET
-    CURRENT_PACKET = data
-    # Process do item here...
+    kart_id = data['to']
+    item = data['item']
+    uid = data['uid']
+    if kart_id == globals.KART_ID and uid not in globals.seen_uids:
+        globals.seen_uids.add(uid)
+        speed_control(item)
+        item_hit(item)
     return
 
 def write_packet(packet):
-    global ser
-    ser.write(packet)
-
+    globals.ser.write(packet)
 
 def read_packet():
 # look for magic number
     maybe_magic = bytes([0, 0, 0, 0])
     while True:
         maybe_magic = maybe_magic[1:] + globals.ser.read(1)
-        # if len(data) < 4:
-            # continue  # not enough data, try again
-        # Unpack as a little-endian unsigned int
         magic = struct.unpack('<I', maybe_magic)[0]
-        if magic == PACKET_START_MAGIC:
+        if magic == globals.PACKET_START_MAGIC:
             break  # found the packet start
 
     # Now read the tag (assume it's a 4-byte integer in little-endian)
@@ -118,7 +121,7 @@ def read_packet():
 
 def build_packet(tag, payload_bytes):
     """Build a complete packet with start magic, tag, and payload."""
-    packet = struct.pack('<I', PACKET_START_MAGIC)
+    packet = struct.pack('<I', globals.PACKET_START_MAGIC)
     packet += struct.pack('<I', tag)
     packet += payload_bytes
     return packet

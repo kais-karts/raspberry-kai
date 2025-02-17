@@ -1,38 +1,37 @@
-import RPi.GPIO as GPIO
+import time
+import gpio_speed
+import threading
+import globals
 
-# Define your GPIO pin numbers (adjust to your wiring)
-NORMAL_PIN = 5
-SLOW_PIN = 6
-STOP_PIN = 13
+def delayed_call(duration: int):
+    time.sleep(duration)
+    gpio_speed.normal_speed()
 
-# Setup GPIO - Initialized at full speed
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(NORMAL_PIN, GPIO.OUT)
-GPIO.setup(SLOW_PIN, GPIO.OUT)
-GPIO.setup(STOP_PIN, GPIO.OUT)
-GPIO.output(NORMAL_PIN, GPIO.LOW)
-GPIO.output(SLOW_PIN, GPIO.LOW)
-GPIO.output(STOP_PIN, GPIO.LOW)
-
-def full_speed():
-    # Equivalent to: digitalWrite(SLOW_PIN, LOW); digitalWrite(NORMAL_PIN, LOW); digitalWrite(D2, LOW);
-    GPIO.output(SLOW_PIN, GPIO.LOW)
-    GPIO.output(NORMAL_PIN, GPIO.LOW)
-    GPIO.output(STOP_PIN, GPIO.LOW)
-
-def normal_speed():
-    # Equivalent to: digitalWrite(SLOW_PIN, LOW); digitalWrite(NORMAL_PIN, HIGH); digitalWrite(D2, LOW);
-    GPIO.output(SLOW_PIN, GPIO.LOW)
-    GPIO.output(NORMAL_PIN, GPIO.HIGH)
-    GPIO.output(STOP_PIN, GPIO.LOW)
-
-def slow_speed():
-    # Equivalent to: digitalWrite(NORMAL_PIN, LOW); digitalWrite(SLOW_PIN, HIGH); digitalWrite(D2, LOW);
-    GPIO.output(NORMAL_PIN, GPIO.LOW)
-    GPIO.output(SLOW_PIN, GPIO.HIGH)
-    GPIO.output(STOP_PIN, GPIO.LOW)
-
-def no_speed():
-    GPIO.output(NORMAL_PIN, GPIO.LOW)
-    GPIO.output(SLOW_PIN, GPIO.LOW)
-    GPIO.output(STOP_PIN, GPIO.HIGH)
+def speed_control(item: int):
+    match item:
+        case 0:
+            # Banana
+            gpio_speed.no_speed()
+        case 1:
+            # Bomb
+            gpio_speed.no_speed()
+        case 2:
+            # redShroom
+            gpio_speed.full_speed()
+        case 3:
+            # goldShroom
+            gpio_speed.full_speed()
+        case 4:
+            # redShell
+            gpio_speed.no_speed()
+        case 5:
+            # blueShell
+            gpio_speed.no_speed()
+        case 6:
+            # lightning
+            gpio_speed.slow_speed()
+        case 7:
+            # bulletBill
+            gpio_speed.no_speed()
+    t = threading.Thread(target=delayed_call, args=(globals.ITEM_DURATION[item],))
+    t.start()
