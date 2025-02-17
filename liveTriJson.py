@@ -100,7 +100,7 @@ def init():
     BRANCH_INFO["max_dist"] = np.linalg.norm(np.array(BRANCH_INFO["start_pos"]) - np.array(BRANCH_INFO["end_pos"]))
 
     # Define beacons location
-    BEACONS: Dict[str, Tuple[int, int]] = {
+    BEACONS = {
         "0": (200, 27),  # y, x top left IN FOOT
         "1": (300, 30),  # mid
         "Beacon 3": (500, 27)   # left

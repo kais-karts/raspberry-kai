@@ -41,6 +41,7 @@ def handle_do_item(data):
     return
 
 def write_packet(packet):
+    packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
     globals.ser.write(packet)
 
 def read_packet():
@@ -58,53 +59,29 @@ def read_packet():
         return None
     tag = struct.unpack('<I', tag_bytes)[0]
 
-    # Tag definitions:
-    # 0 = Ping, 1 = AnchorDistances, 2 = PositionEstimate,
-    # 3 = UseItem, 4 = RankingUpdate, 5 = GetItem, 6 = DoItem
-    if tag == 0:  # Ping: { u32 from; u32 data; }
-        payload = globals.ser.read(4 + 4)  # 8 bytes total
-        if len(payload) < 8:
+    if tag == 1:  # AnchorDistances: { f32 distances[NUM_ANCHORS]; }
+        payload = globals.ser.read(4 * constvars.NUM_ANCHORS)
+        if len(payload) < 4 * constvars.NUM_ANCHORS:
             return None
-        from_val, data_val = struct.unpack('<II', payload)
-        return {'tag': 'Ping', 'from': from_val, 'data': data_val}
-    
-    elif tag == 1:  # AnchorDistances: { f32 distances[NUM_ANCHORS]; }
-        payload = globals.ser.read(4 * NUM_ANCHORS)
-        if len(payload) < 4 * NUM_ANCHORS:
-            return None
-        distances = struct.unpack('<' + 'f' * NUM_ANCHORS, payload)
+        distances = struct.unpack('<' + 'f' * constvars.NUM_ANCHORS, payload)
         handle_anchor_distances(distances)
         return {'tag': 'AnchorDistances', 'distances': distances}
     
-    elif tag == 2:  # PositionEstimate: { u32 from; i32 loc_index }
-        payload = globals.ser.read(4 + 4)  # 8 bytes total
-        if len(payload) < 8:
-            return None
-        from_val, loc_index = struct.unpack('<Ii', payload)
-        return {'tag': 'PositionEstimate', 'from': from_val, 'loc_index': loc_index}
-    
-    elif tag == 3:  # UseItem: { u32 from; u32 item; }
-        payload = globals.ser.read(4 + 4)  # 8 bytes
-        if len(payload) < 8:
-            return None
-        from_val, item = struct.unpack('<II', payload)
-        return {'tag': 'UseItem', 'from': from_val, 'item': item}
-    
     elif tag == 4:  # RankingUpdate: { u8 positions[NUM_KARTS] }
-        payload = globals.ser.read(NUM_KARTS)  # read NUM_KARTS bytes
-        if len(payload) < NUM_KARTS:
+        payload = globals.ser.read(constvars.NUM_KARTS)  # read NUM_KARTS bytes
+        if len(payload) < constvars.NUM_KARTS:
             return None
-        positions = struct.unpack('>' + 'B' * NUM_KARTS, payload)
+        positions = struct.unpack('>' + 'B' * constvars.NUM_KARTS, payload)
         handle_ranking_update({'positions': positions})
         return {'tag': 'RankingUpdate', 'positions': positions}
     
-    elif tag == 5:  # GetItem: { u32 to; u32 item; u32 uid }
-        payload = globals.ser.read(4 + 4 + 4)  # 12 bytes total
-        if len(payload) < 12:
-            return None
-        to_val, item, uid = struct.unpack('<III', payload)
-        handle_get_item({'to': to_val, 'uid': uid})
-        return {'tag': 'GetItem', 'to': to_val, 'item': item, 'uid': uid}
+    # elif tag == 5:  # GetItem: { u32 to; u32 item; u32 uid }
+    #     payload = globals.ser.read(4 + 4 + 4)  # 12 bytes total
+    #     if len(payload) < 12:
+    #         return None
+    #     to_val, item, uid = struct.unpack('<III', payload)
+    #     handle_get_item({'to': to_val, 'uid': uid})
+    #     return {'tag': 'GetItem', 'to': to_val, 'item': item, 'uid': uid}
     
     elif tag == 6:  # DoItem: { u32 to; u32 item; u32 uid }
         payload = globals.ser.read(4 + 4 + 4)  # 12 bytes total
@@ -135,3 +112,26 @@ def build_use_item_packet(from_val, item):
     # tag 3
     payload = struct.pack('<BB', from_val, item)
     return build_packet(3, payload)
+
+
+def tests():
+    def test_anchor_distances():
+        print("Testing AnchorDistances packet")
+        handle_anchor_distances([1.0, 2.0, 3.0])
+        print("Sent AnchorDistances packet")
+    
+    def test_ranking_update():
+        print("Testing RankingUpdate packet")
+        handle_ranking_update({'positions': [1, 2, 3, 4, 5, 6]})
+        print("Sent RankingUpdate packet")
+
+    def test_do_item():
+        print("Testing DoItem packet")
+        handle_do_item({'to': 1, 'item': 2, 'uid': 3})
+        print("Sent DoItem packet")
+
+    test_anchor_distances()
+    test_ranking_update()
+    test_do_item()
+
+    

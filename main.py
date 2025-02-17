@@ -2,6 +2,7 @@ from app import get_app, get_socket
 import api
 import threading
 import time
+from serial_comms import driver
 
 item_names = [
   "Banana",
@@ -23,15 +24,6 @@ ui_connected_event = threading.Event()
 def flask():
     socketio.run(app, port=8000, debug=True, use_reloader=False)
 
-def main():
-    while True:
-        for j in range(8):
-            for i in range(10):
-                time.sleep(1)
-                print(f"{i}s")
-            print(item_names[j])
-            api.item_pickup(j)
-
 if __name__ == "__main__":
-    threading.Thread(target=main).start()  # Run main() in a different thread
+    threading.Thread(target=driver).start()  # Run main() in a different thread
     flask()  # Run flask() in the main thread
