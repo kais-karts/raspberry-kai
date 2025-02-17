@@ -4,6 +4,7 @@ import globals
 from liveTriJson import recieve_anchors
 from api import update_positions, item_pickup, item_hit, item_use
 from speed_control import speed_control
+import utils
 
 def handle_anchor_distances(data):
     ''' 
@@ -16,17 +17,18 @@ def handle_anchor_distances(data):
 
 def handle_ranking_update(data):
     print("RankingUpdate:", data)
+    globals.kart_rank = data['positions'].index(constvars.KART_ID) + 1
     update_positions(data["positions"])
     return
 
 def handle_get_item(data):
     print("GetItem:", data)
     kart_id = data['to']
-    item = data['item']
+    globals.kart_item = utils.draw_item(globals.kart_rank)
     uid = data['uid']
     if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
         globals.seen_uids.add(uid)
-        item_pickup(item)
+        item_pickup(globals.kart_item)
     return
 
 def handle_do_item(data):
@@ -39,6 +41,13 @@ def handle_do_item(data):
         speed_control(item)
         item_hit(item, constvars.ITEM_DURATION[item])
     return
+
+def use_item():
+    item = globals.kart_item 
+    globals.kart_item = None
+    if item is not None:
+        item_use(constvars.ITEM_DURATION[item])
+        write_packet(build_position_estimate_packet(constvars.KART_ID, globals.item))
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
@@ -75,13 +84,13 @@ def read_packet():
         handle_ranking_update({'positions': positions})
         return {'tag': 'RankingUpdate', 'positions': positions}
     
-    # elif tag == 5:  # GetItem: { u32 to; u32 item; u32 uid }
-    #     payload = globals.ser.read(4 + 4 + 4)  # 12 bytes total
-    #     if len(payload) < 12:
-    #         return None
-    #     to_val, item, uid = struct.unpack('<III', payload)
-    #     handle_get_item({'to': to_val, 'uid': uid})
-    #     return {'tag': 'GetItem', 'to': to_val, 'item': item, 'uid': uid}
+    elif tag == 5:  # GetItem: { u32 to; u32 uid }
+        payload = globals.ser.read(4 + 4)  # 12 bytes total
+        if len(payload) < 8:
+            return None
+        to_val, uid = struct.unpack('<III', payload)
+        handle_get_item({'to': to_val, 'uid': uid})
+        return {'tag': 'GetItem', 'to': to_val, 'uid': uid}
     
     elif tag == 6:  # DoItem: { u32 to; u32 item; u32 uid }
         payload = globals.ser.read(4 + 4 + 4)  # 12 bytes total
