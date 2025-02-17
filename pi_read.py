@@ -3,8 +3,9 @@ import constvars
 import globals
 from liveTriJson import recieve_anchors
 from api import update_positions, item_pickup, item_hit, item_use
-from speed_control import speed_control
+from speed_control import speed_control, light_button, reset_button
 import utils
+import uuid
 
 def handle_anchor_distances(data):
     ''' 
@@ -17,18 +18,24 @@ def handle_anchor_distances(data):
 
 def handle_ranking_update(data):
     print("RankingUpdate:", data)
-    globals.kart_rank = data['positions'].index(constvars.KART_ID) + 1
-    update_positions(data["positions"])
+    positions = data['positions']
+    if constvars.KART_ID in data['positions']:
+        globals.kart_rank = data['positions'].index(constvars.KART_ID) + 1
+    else:
+        globals.kart_rank = len(data['positions']) + 1
+        positions.append(constvars.KART_ID)
+    update_positions(positions)
     return
 
 def handle_get_item(data):
     print("GetItem:", data)
     kart_id = data['to']
-    globals.kart_item = utils.draw_item(globals.kart_rank)
     uid = data['uid']
     if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
+        globals.kart_item = utils.draw_item(globals.kart_rank)
         globals.seen_uids.add(uid)
-        item_pickup(globals.kart_item)
+        light_button()
+        # item_pickup(globals.kart_item)
     return
 
 def handle_do_item(data):
@@ -39,19 +46,24 @@ def handle_do_item(data):
     if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
         globals.seen_uids.add(uid)
         speed_control(item)
-        item_hit(item, constvars.ITEM_DURATION[item])
+        # item_hit(item, constvars.ITEM_DURATION[item])
     return
 
 def use_item():
     item = globals.kart_item 
     globals.kart_item = None
     if item is not None:
-        item_use(constvars.ITEM_DURATION[item])
-        write_packet(build_position_estimate_packet(constvars.KART_ID, globals.item))
+        # item_use(constvars.ITEM_DURATION[item])
+        uid = uuid.uuid4()
+        reset_button()
+        write_packet(build_use_item_packet(constvars.KART_ID, globals.item, uid))
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
     globals.ser.write(packet)
+
+def init_send():
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 0))
 
 def read_packet():
 # look for magic number
@@ -114,12 +126,12 @@ def build_packet(tag, payload_bytes):
 
 def build_position_estimate_packet(from_val, loc_index):
     # tag 2
-    payload = struct.pack('<BI', from_val, loc_index)
+    payload = struct.pack('<Ii', from_val, loc_index)
     return build_packet(2, payload)
 
-def build_use_item_packet(from_val, item):
+def build_use_item_packet(from_val, item, uid):
     # tag 3
-    payload = struct.pack('<BB', from_val, item)
+    payload = struct.pack('<III', from_val, item, uid)
     return build_packet(3, payload)
 
 

@@ -1,7 +1,7 @@
 from logging import getLogger
 import serial
 import constvars
-from pi_read import read_packet, tests
+from pi_read import read_packet, init_send, tests
 import liveTriJson as tri
 import globals
 import gpio_logic as io
@@ -13,6 +13,7 @@ def init():
     try:
         globals.ser = serial.Serial(constvars.SERIAL_PORT, constvars.BAUD_RATE, timeout=1)
         logger.info(f"Opened serial port {constvars.SERIAL_PORT} at {constvars.BAUD_RATE} baud.")
+        init_send()
     except Exception as e:
         logger.error(f"Failed to open serial port {constvars.SERIAL_PORT}: {e}")
         exit() # No point continuing if we can't open serial

@@ -36,11 +36,18 @@ def set_speed(speed: Optional[int]):
     else:
         normal_speed()
 
+def light_button():
+    GPIO.output(BUTTON_OUT, GPIO.HIGH)
+
+def reset_button():
+    GPIO.output(BUTTON_OUT, GPIO.LOW)
+
 def setup():
     # Setup GPIO - Initialized at full speed
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(BUTTON_IN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.add_event_detect(10,GPIO.RISING,callback=use_item)
+    GPIO.setup(BUTTON_IN, GPIO.IN)
+    GPIO.output(BUTTON_OUT, GPIO.LOW)
+    GPIO.add_event_detect(BUTTON_IN, GPIO.RISING, callback=use_item)
     GPIO.setup(BUTTON_OUT, GPIO.OUT)
 
     GPIO.setup(NORMAL_PIN, GPIO.OUT)
