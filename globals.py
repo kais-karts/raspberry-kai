@@ -5,8 +5,11 @@ global rankings
 global kart_item
 global kart_rank
 
+global counter
+
 ser = None
 seen_uids = set()
 rankings = []
 kart_item = None
 kart_rank = None
+counter = None

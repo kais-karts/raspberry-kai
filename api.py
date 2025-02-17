@@ -1,11 +1,5 @@
 import typing
 from typing import NamedTuple, List, Literal
-from flask_socketio import SocketIO
-from flask import Flask
-from app import get_app, get_socket
-
-app = get_app()
-socketio = get_socket()
 
 class Position(NamedTuple):
     name: str

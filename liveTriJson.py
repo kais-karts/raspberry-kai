@@ -1,5 +1,4 @@
 import numpy as np
-import cv2 as cv
 import pickle
 from itertools import product
 import time
@@ -75,7 +74,7 @@ def recieve_anchors(data: dict) -> int:
     for ix, distance in enumerate(data["distances"]):
         uwb_data[ix] = distance * 0.03280841666667
 
-    location = get_location(uwb_data, TRACK_LIST, TRACK_SET, last_point, BEACONS)
+    location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     last_point = location
     print(location)
     # start and end track index and location
@@ -107,59 +106,3 @@ def init():
     }
 
     last_point = None
-
-# # Run the localization algorithm
-# if __name__ == '__main__':
-#     ser = serial.Serial('COM27', 9600)
-
-#     # Load image and track data
-#     track_list = pickle.load(open('ordered_points.pkl', 'rb'))
-#     track_set = set(track_list)  # Create the set for fast lookup
-
-#     # Define beacons
-#     beacons: Dict[str, Tuple[int, int]] = {
-#         "0": (200, 27),  # y, x top left IN FOOT
-#         "1": (300, 30),  # mid
-#         "Beacon 3": (500, 27)   # left
-#     }
-
-#     update_time = .1
-#     last_point = None
-#     start_time = time.time()
-
-#     while True:
-#         # Read serial data 
-#         try:
-#             beacons_data = ser.readline().decode('utf-8').strip()
-#             if not beacons_data:
-#                 continue
-#             try:
-#                 uwb_data = json.loads(beacons_data)
-#                 # Convert distances from cm to feet
-#                 for key in uwb_data:
-#                     uwb_data[key] = uwb_data[key] * 0.03280841666667
-#             except json.JSONDecodeError:
-#                 continue
-
-#             location = get_location(uwb_data, track_list, track_set, last_point, beacons)
-#             last_point = location
-#             print(location)
-#             # find the index of location in the track_list
-#             location_index = track_list.index(location)
-#             # send json PE data for location
-#             data = {
-#                 "id": uuid.uuid4().int & (1<<32)-1,
-#                 "tags": "pe",
-#                 "args": {   
-#                     "from": 0,
-#                     "position": {
-#                         "loc_index": location_index,
-#                     }
-#                 }
-#             }
-#             ser.write(json.dumps(data).encode())
-#         except KeyboardInterrupt:
-#             break
-        
-# cv.destroyAllWindows()
-# ser.close()

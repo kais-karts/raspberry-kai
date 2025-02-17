@@ -3,9 +3,11 @@ import constvars
 import globals
 from liveTriJson import recieve_anchors
 from api import update_positions, item_pickup, item_hit, item_use
-from speed_control import speed_control, light_button, reset_button
+from speed_control import speed_control
+from gpio_logic import light_button, reset_button
 import utils
 import uuid
+
 
 def handle_anchor_distances(data):
     ''' 
@@ -26,6 +28,15 @@ def handle_ranking_update(data):
         globals.kart_rank = len(data['positions']) + 1
         positions.append(constvars.KART_ID)
     update_positions(positions)
+    if globals.counter == None:
+        globals.counter = 0
+    # write_packet(build_position_estimate_packet(constvars.KART_ID, int(globals.counter), 0, 0))
+    init_send(globals.counter)
+    globals.counter += 1
+    print("bro")
+
+    # init_send(globals.counter)
+
     return
 
 def handle_get_item(data):
@@ -61,25 +72,35 @@ def use_item():
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
+    print("writing packet", packet)
     globals.ser.write(packet)
+    globals.ser.flush()
 
-def init_send():
-    write_packet(build_position_estimate_packet(constvars.KART_ID, 0))
+def init_send(test: int = 0):
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, 8, 8))
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, 8, 7))
 
 def read_packet():
 # look for magic number
     maybe_magic = bytes([0, 0, 0, 0])
     while True:
-        maybe_magic = maybe_magic[1:] + globals.ser.read(1)
+        # checking for timed out read
+        serial_read = globals.ser.read(1)
+        print(f"reading {serial_read}")
+        if (serial_read == b''):
+            return
+        maybe_magic = maybe_magic[1:] + serial_read
         magic = struct.unpack('<I', maybe_magic)[0]
         if magic == constvars.PACKET_START_MAGIC:
             break  # found the packet start
-
+    print("Magic number found")
+    print("seen", globals.seen_uids)
     # Now read the tag (assume it's a 4-byte integer in little-endian)
     tag_bytes = globals.ser.read(4)
     if len(tag_bytes) < 4:
         return None
     tag = struct.unpack('<I', tag_bytes)[0]
+    print(f"Tag {tag}")
 
     if tag == 1:  # AnchorDistances: { f32 distances[NUM_ANCHORS]; }
         payload = globals.ser.read(4 * constvars.NUM_ANCHORS)
@@ -101,7 +122,7 @@ def read_packet():
         payload = globals.ser.read(4 + 4)  # 12 bytes total
         if len(payload) < 8:
             return None
-        to_val, uid = struct.unpack('<III', payload)
+        to_val, uid = struct.unpack('<II', payload)
         handle_get_item({'to': to_val, 'uid': uid})
         return {'tag': 'GetItem', 'to': to_val, 'uid': uid}
     

@@ -1,5 +1,5 @@
 # Serial Port Settings
-SERIAL_PORT = '/dev/ttyUSB0'  # or '/dev/serial0' on a Raspberry Pi
+SERIAL_PORT = '/dev/ttyACM0'  # or '/dev/serial0' on a Raspberry Pi
 BAUD_RATE = 115200
 
 # Define constants
@@ -14,6 +14,7 @@ ITEM_SPEED = [0, 0, 2, 2, 0, 0, 1, 0]
 
 # Define the magic number (packet start marker)
 PACKET_START_MAGIC = 0xDEADBEEF
+PACKET_LEN_BYTES = 24
 
 # Define your GPIO pin numbers (adjust to your wiring)
 NORMAL_PIN = 5

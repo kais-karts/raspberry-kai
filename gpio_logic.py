@@ -1,7 +1,6 @@
 import RPi.GPIO as GPIO
 from typing import Optional
 from constvars import NORMAL_PIN, SLOW_PIN, STOP_PIN, BUTTON_IN, BUTTON_OUT
-from pi_read import use_item
 
 def full_speed():
     # Equivalent to: digitalWrite(SLOW_PIN, LOW); digitalWrite(NORMAL_PIN, LOW); digitalWrite(D2, LOW);
@@ -44,11 +43,11 @@ def reset_button():
 
 def setup():
     # Setup GPIO - Initialized at full speed
+    GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(BUTTON_IN, GPIO.IN)
-    GPIO.output(BUTTON_OUT, GPIO.LOW)
-    GPIO.add_event_detect(BUTTON_IN, GPIO.RISING, callback=use_item)
     GPIO.setup(BUTTON_OUT, GPIO.OUT)
+    GPIO.output(BUTTON_OUT, GPIO.LOW)
 
     GPIO.setup(NORMAL_PIN, GPIO.OUT)
     GPIO.setup(SLOW_PIN, GPIO.OUT)
