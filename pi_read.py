@@ -11,7 +11,7 @@ def handle_anchor_distances(data):
     '''
     print("AnchorDistances:", data)
     loc_index = recieve_anchors({'distances': data})
-    write_packet(build_position_estimate_packet(globals.KART_ID, loc_index))
+    write_packet(build_position_estimate_packet(constvars.KART_ID, loc_index))
     return
 
 def handle_ranking_update(data):
@@ -24,7 +24,7 @@ def handle_get_item(data):
     kart_id = data['to']
     item = data['item']
     uid = data['uid']
-    if kart_id == globals.KART_ID and uid not in globals.seen_uids:
+    if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
         globals.seen_uids.add(uid)
         item_pickup(item)
     return
@@ -34,7 +34,7 @@ def handle_do_item(data):
     kart_id = data['to']
     item = data['item']
     uid = data['uid']
-    if kart_id == globals.KART_ID and uid not in globals.seen_uids:
+    if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
         globals.seen_uids.add(uid)
         speed_control(item)
         item_hit(item, constvars.ITEM_DURATION[item])
@@ -49,7 +49,7 @@ def read_packet():
     while True:
         maybe_magic = maybe_magic[1:] + globals.ser.read(1)
         magic = struct.unpack('<I', maybe_magic)[0]
-        if magic == globals.PACKET_START_MAGIC:
+        if magic == constvars.PACKET_START_MAGIC:
             break  # found the packet start
 
     # Now read the tag (assume it's a 4-byte integer in little-endian)
@@ -121,7 +121,7 @@ def read_packet():
 
 def build_packet(tag, payload_bytes):
     """Build a complete packet with start magic, tag, and payload."""
-    packet = struct.pack('<I', globals.PACKET_START_MAGIC)
+    packet = struct.pack('<I', constvars.PACKET_START_MAGIC)
     packet += struct.pack('<I', tag)
     packet += payload_bytes
     return packet

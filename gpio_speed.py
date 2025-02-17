@@ -1,10 +1,6 @@
 import RPi.GPIO as GPIO
 from typing import Optional
-
-# Define your GPIO pin numbers (adjust to your wiring)
-NORMAL_PIN = 5
-SLOW_PIN = 6
-STOP_PIN = 13
+from constvars import NORMAL_PIN, SLOW_PIN, STOP_PIN
 
 # Setup GPIO - Initialized at full speed
 GPIO.setmode(GPIO.BCM)
@@ -12,7 +8,16 @@ GPIO.setup(NORMAL_PIN, GPIO.OUT)
 GPIO.setup(SLOW_PIN, GPIO.OUT)
 GPIO.setup(STOP_PIN, GPIO.OUT)
 GPIO.output(NORMAL_PIN, GPIO.LOW)
-GPIO.output(SLOW_PIN, GPIO.LOW)
+GPIO.output(SLOW_PIN, GPIO.HIGH)
+GPIO.output(STOP_PIN, GPIO.LOW)
+
+# Setup GPIO - Initialized at full speed
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(NORMAL_PIN, GPIO.OUT)
+GPIO.setup(SLOW_PIN, GPIO.OUT)
+GPIO.setup(STOP_PIN, GPIO.OUT)
+GPIO.output(NORMAL_PIN, GPIO.LOW)
+GPIO.output(SLOW_PIN, GPIO.HIGH)
 GPIO.output(STOP_PIN, GPIO.LOW)
 
 def full_speed():

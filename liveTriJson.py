@@ -5,6 +5,7 @@ from itertools import product
 import time
 from typing import Dict, Tuple, List, Optional
 from globals import *
+from constvars import *
 
 def circle_intersection(point: Tuple[int, int], radius: float, track_set: set) -> List[Tuple[int, int]]:
     """Find intersection points of a circle centered at 'point' with 'track'."""
