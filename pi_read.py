@@ -1,5 +1,5 @@
 import struct
-from constvars import *
+import constvars
 import globals
 from liveTriJson import recieve_anchors
 from api import update_positions, item_pickup, item_hit, item_use
@@ -37,7 +37,7 @@ def handle_do_item(data):
     if kart_id == globals.KART_ID and uid not in globals.seen_uids:
         globals.seen_uids.add(uid)
         speed_control(item)
-        item_hit(item)
+        item_hit(item, constvars.ITEM_DURATION[item])
     return
 
 def write_packet(packet):

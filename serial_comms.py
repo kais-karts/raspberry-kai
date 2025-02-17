@@ -1,8 +1,3 @@
-"""
-
-bbare minimum pi -> esp example
-
-"""
 from logging import getLogger
 import serial
 import constvars
