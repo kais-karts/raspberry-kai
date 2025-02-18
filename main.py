@@ -1,4 +1,3 @@
-import api
 import threading
 import time
 from serial_comms import driver

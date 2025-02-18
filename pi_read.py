@@ -2,11 +2,12 @@ import struct
 import constvars
 import globals
 from liveTriJson import recieve_anchors
-from api import update_positions, item_pickup, item_hit, item_use
 from speed_control import speed_control
 from gpio_logic import light_button, reset_button
 import utils
-import uuid
+import random
+import asyncio
+from ui_comms import item_pickup, item_hit, item_use
 
 
 def handle_anchor_distances(data):
@@ -16,6 +17,7 @@ def handle_anchor_distances(data):
     print("AnchorDistances:", data)
     loc, loc_index = recieve_anchors({'distances': data})
     x, y = loc
+    globals.update_position(x, y)
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y,loc_index))
     return
 
@@ -27,16 +29,11 @@ def handle_ranking_update(data):
     else:
         globals.kart_rank = len(data['positions']) + 1
         positions.append(constvars.KART_ID)
-    update_positions(positions)
-    if globals.counter == None:
-        globals.counter = 0
-    # write_packet(build_position_estimate_packet(constvars.KART_ID, int(globals.counter), 0, 0))
-    init_send(globals.counter)
-    globals.counter += 1
-    print("bro")
-
+    # was for debugging
+    # if globals.counter == None:
+    #     globals.counter = 0
     # init_send(globals.counter)
-
+    # globals.counter += 1
     return
 
 def handle_get_item(data):
@@ -47,7 +44,8 @@ def handle_get_item(data):
         globals.kart_item = utils.draw_item(globals.kart_rank)
         globals.seen_uids.add(uid)
         light_button()
-        # item_pickup(globals.kart_item)
+        x, y = globals.get_position()
+        asyncio.run(item_pickup(globals.kart_item, x, y))
     return
 
 def handle_do_item(data):
@@ -58,17 +56,31 @@ def handle_do_item(data):
     if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
         globals.seen_uids.add(uid)
         speed_control(item)
-        # item_hit(item, constvars.ITEM_DURATION[item])
+        x, y = globals.get_position()
+        if constvars.ITEMS[item] in constvars.DEBUFF_ITEMS:
+            asyncio.run(item_hit(item, x, y))
+        elif constvars.ITEMS[item] in constvars.BUFF_ITEMS:
+            asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
+        else:
+            print("DoItem: Unknown item type")
     return
 
-def use_item():
+def use_item(channel):
+    print(f"Button {channel} pressed, item {globals.kart_item} used")
     item = globals.kart_item 
     globals.kart_item = None
     if item is not None:
-        # item_use(constvars.ITEM_DURATION[item])
-        uid = uuid.uuid4()
+        uid = random.getrandbits(32)
+        print(f"Kart {constvars.KART_ID}, item {item}, uid {uid}")
+        if constvars.ITEMS[item] in constvars.BUFF_ITEMS:
+            speed_control(item)
+            x, y = globals.get_position()
+            asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
+        else:
+            asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
+            write_packet(build_use_item_packet(constvars.KART_ID, item, uid))
         reset_button()
-        write_packet(build_use_item_packet(constvars.KART_ID, globals.item, uid))
+
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
@@ -86,7 +98,7 @@ def read_packet():
     while True:
         # checking for timed out read
         serial_read = globals.ser.read(1)
-        print(f"reading {serial_read}")
+        # print(f"reading {serial_read}")
         if (serial_read == b''):
             return
         maybe_magic = maybe_magic[1:] + serial_read

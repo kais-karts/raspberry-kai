@@ -6,22 +6,25 @@ BAUD_RATE = 115200
 NUM_ANCHORS = 2   # for AnchorDistances
 NUM_KARTS = 6     # for RankingUpdate
 
-ITEM_DURATION = [3, 10, 3, 10, 5, 5, 5, 20] # (in seconds)
+ITEM_DURATION = [3, 10, 5, 6, 15, 10, 5, 7] # (in seconds)
 
-ITEMS = ['Banana', 'Bomb', 'redShroom', 'goldShroom', 'redShell', 'blueShell', 'lightning', 'bulletBill']
+ITEMS = ['Banana', 'Bomb', 'redShroom', 'lightning', 'bulletBill', 'gold_shroom', 'red_shell', 'blue_shell']
 
-ITEM_SPEED = [0, 0, 2, 2, 0, 0, 1, 0]
+BUFF_ITEMS = {'redShroom', 'goldShroom','bulletBill'}
+DEBUFF_ITEMS = {'Banana', 'Bomb', 'redShell', 'blueShell', 'lightning'}
+
+ITEM_SPEED = [0, 0, 2, 1, 2, 2, 0, 0]
 
 # Define the magic number (packet start marker)
 PACKET_START_MAGIC = 0xDEADBEEF
 PACKET_LEN_BYTES = 24
 
 # Define your GPIO pin numbers (adjust to your wiring)
-NORMAL_PIN = 5
-SLOW_PIN = 6
-STOP_PIN = 13
+NORMAL_PIN = 13
+SLOW_PIN = 5
+STOP_PIN = 6
 
 KART_ID = 0
 
-BUTTON_IN, BUTTON_OUT= 17, 27
+BUTTON_IN, BUTTON_OUT= 27, 22
 

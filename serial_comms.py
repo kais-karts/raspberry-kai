@@ -7,6 +7,9 @@ import globals
 import gpio_logic as io
 import time
 import RPi.GPIO as GPIO
+import ui_comms as ui
+import asyncio
+import threading
 
 logger = getLogger("SerialReader")
 
@@ -23,6 +26,8 @@ def driver():
     init()
     tri.init()
     io.setup()
+    t = threading.Thread(target=ui.init)
+    t.start()
     # attach event listener to GPIO pin
     GPIO.add_event_detect(constvars.BUTTON_IN, GPIO.RISING, callback=use_item)
     print("System initialized.")
