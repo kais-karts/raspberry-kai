@@ -79,7 +79,6 @@ def recieve_anchors(data: dict) -> int:
     print(location)
     # start and end track index and location
     if inRect((600,0), (435, 77), location) or inRect((547,77), (435, 236), location):
-        #scaled distance of BRANCH_INFO["end_pos"]
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
         location_index = int(BRANCH_INFO["start_idx"] + (distance_to_branch_end - BRANCH_INFO["max_dist"]) * (BRANCH_INFO["end_idx"] - BRANCH_INFO["start_idx"]) / -BRANCH_INFO["max_dist"])
     else:
@@ -94,9 +93,9 @@ def init():
     # Load image and track data
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
     TRACK_LIST = pickle.load(open('mainTrack.pkl', 'rb'))
-    TRACK_SET = set(pickle.load(open('totalTrack.pkl', 'rb')))  # Create the set for fast lookup
-    BRANCH_INFO = {"start_pos": (592,67), "start_idx": 800, "end_pos": (281,244), "end_idx": 1100}
-    BRANCH_INFO["max_dist"] = np.linalg.norm(np.array(BRANCH_INFO["start_pos"]) - np.array(BRANCH_INFO["end_pos"]))
+    TRACK_SET = pickle.load(open('totalTrack.pkl', 'rb'))  # Create the set for fast lookup
+    BRANCH_INFO = {"start_pos": (592,67), "start_idx": 1524, "end_pos": (481,246), "end_idx": 1870}
+    BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
 
     # Define beacons location
     BEACONS = {
