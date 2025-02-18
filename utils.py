@@ -19,4 +19,5 @@ all_items = all_items / all_items.sum(axis=0)
 def draw_item(place):
     """Draw an item based on the place."""
     choice = constvars.ITEMS.index(np.random.choice(constvars.ITEMS, p=all_items[:, place-1]))
+    print(f"Random choice yieled {choice} from {all_items[:, place-1]}")
     return choice
