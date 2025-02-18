@@ -8,7 +8,7 @@ NUM_KARTS = 6     # for RankingUpdate
 
 ITEM_DURATION = [3, 10, 5, 6, 15, 10, 5, 7] # (in seconds)
 
-ITEMS = ['Banana', 'Bomb', 'redShroom', 'lightning', 'bulletBill', 'gold_shroom', 'red_shell', 'blue_shell']
+ITEMS = ['Banana', 'Bomb', 'redShroom', 'lightning', 'bulletBill', 'gold_shroom', 'redShell', 'blueShell']
 
 BUFF_ITEMS = {'redShroom', 'goldShroom','bulletBill'}
 DEBUFF_ITEMS = {'Banana', 'Bomb', 'redShell', 'blueShell', 'lightning'}
