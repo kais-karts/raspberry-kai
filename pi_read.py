@@ -90,7 +90,7 @@ def write_packet(packet):
     globals.ser.flush()
 
 def init_send(test: int = 0):
-    write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 8))
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 0))
 
 def read_packet():
 # look for magic number

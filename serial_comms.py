@@ -30,7 +30,7 @@ def driver():
     t.start()
     # attach event listener to GPIO pin
     GPIO.add_event_detect(constvars.BUTTON_IN, GPIO.RISING, callback=use_item)
-    print("System initialized.")
+    print(f"Kart System {constvars.KART_ID} initialized.")
     while True:
         data = read_packet()
         time.sleep(0.01)
