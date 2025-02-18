@@ -8,7 +8,7 @@ NUM_KARTS = 6     # for RankingUpdate
 
 ITEM_DURATION = [3, 10, 5, 6, 15, 10, 5, 7] # (in seconds)
 
-ITEMS = ['Banana', 'Bomb', 'redShroom', 'lightning', 'bulletBill', 'gold_shroom', 'redShell', 'blueShell']
+ITEMS = ['Banana', 'Bomb', 'redShroom', 'lightning', 'bulletBill', 'goldShroom', 'redShell', 'blueShell']
 
 BUFF_ITEMS = {'redShroom', 'goldShroom','bulletBill'}
 DEBUFF_ITEMS = {'Banana', 'Bomb', 'redShell', 'blueShell', 'lightning'}
@@ -26,7 +26,7 @@ STOP_PIN = 6
 
 
 # DONT FORGET TO CHANGE
-KART_ID = 2
+KART_ID = 1
 
 BUTTON_IN, BUTTON_OUT= 27, 22
 
