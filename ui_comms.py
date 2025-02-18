@@ -90,6 +90,7 @@ async def item_use(duration: float, x, y) -> None:
 async def hello(websocket, path):
     global websocket_conn
     websocket_conn = websocket
+    print("websocket started")
     while True:
         pass
     # while True:
@@ -105,8 +106,8 @@ def init():
     # ws_task = connect_websocket(uri)
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-
     start_server = websockets.serve(hello, "localhost", 5000)
+    # print("websocket started")
     loop.run_until_complete(start_server)
     loop.run_forever()
     # global websocket_conn

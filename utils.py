@@ -1,4 +1,5 @@
 import numpy as np
+import constvars
 
 # Configure Mariokart item weights 1st, 2nd, 3rd, 4th, 5th, 6th
 # https://www.mariowiki.com/Mario_Kart_8_item_probability_distributions
@@ -15,8 +16,6 @@ bulletBill = [0,0,0,0,0,50]
 all_items = np.array([Banana, Bomb, redShroom, goldShroom, redShell, blueShell, lightning, bulletBill])
 all_items = all_items / all_items.sum(axis=0)
 
-item_names = ['Banana', 'Bomb', 'redShroom', 'goldShroom', 'redShell', 'blueShell', 'lightning', 'bulletBill']
-
 def draw_item(place):
     """Draw an item based on the place."""
-    return item_names.index(np.random.choice(item_names, p=all_items[:, place-1]))
+    return constvars.ITEMS.index(np.random.choice(constvars.ITEMS, p=all_items[:, place-1]))

@@ -72,9 +72,9 @@ def use_item(channel):
     if item is not None:
         uid = random.getrandbits(32)
         print(f"Kart {constvars.KART_ID}, item {item}, uid {uid}")
+        x, y = globals.get_position()
         if constvars.ITEMS[item] in constvars.BUFF_ITEMS:
             speed_control(item)
-            x, y = globals.get_position()
             asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
         else:
             asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
@@ -84,13 +84,13 @@ def use_item(channel):
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
-    print("writing packet", packet)
+    print("writing packet twice", packet)
+    globals.ser.write(packet)
     globals.ser.write(packet)
     globals.ser.flush()
 
 def init_send(test: int = 0):
-    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, 8, 8))
-    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, 8, 7))
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 8))
 
 def read_packet():
 # look for magic number
