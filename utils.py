@@ -13,7 +13,7 @@ lightning = [0, 0, 0, 5, 10, 10]
 bulletBill = [0,0,0,0,0,50]
 
 # combine all items and normalize
-all_items = np.array([Banana, Bomb, redShroom, lightning, bulletBill, gold_shroom, red_shell, blueShell])
+all_items = np.array([Banana, Bomb, redShroom, lightning, bulletBill, goldShroom, redShell, blueShell])
 all_items = all_items / all_items.sum(axis=0)
 
 def draw_item(place):
