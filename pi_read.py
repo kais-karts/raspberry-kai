@@ -21,6 +21,7 @@ def handle_anchor_distances(data):
     x += 1
     y += 1
     loc_index += 1
+    print(x)
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
     globals.update_position(x, y, loc_index)
 
@@ -104,7 +105,7 @@ def use_item(channel):
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
-    print("writing packet twice", packet)
+    # print("writing packet twice", packet)
     globals.ser.write(packet)
     # globals.ser.write(packet)
     globals.ser.flush()
@@ -173,6 +174,9 @@ def read_packet():
         handle_do_item({'to': to_val, 'item': item, 'uid': uid})
         return {'tag': 'DoItem', 'to': to_val, 'item': item, 'uid': uid}
     
+    elif tag == 7:
+        pass
+
     else:
         print("Unknown tag:", tag)
         return None

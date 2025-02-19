@@ -125,7 +125,7 @@ async def player_update(rankings, x, y):
         "y": y
     })
     await websocket_conn.send(msg)
-    print(f"Sent player_update: {msg}")
+    # print(f"Sent player_update: {msg}")
 
 async def hello(websocket, path):
     global websocket_conn
