@@ -84,12 +84,16 @@ def recieve_anchors(data: dict) -> int:
     last_point = location
     print(location)
     # start and end track index and location
+    if not location:
+        location = last_point
+    else:
+        last_point = location
+
     if inRect((600,0), (435, 77), location) or inRect((547,77), (435, 236), location):
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
         location_index = int(BRANCH_INFO["start_idx"] + (distance_to_branch_end - BRANCH_INFO["max_dist"]) * (BRANCH_INFO["end_idx"] - BRANCH_INFO["start_idx"]) / -BRANCH_INFO["max_dist"])
     else:
         location_index = TRACK_LIST.index(location)
-
     return location, location_index
 
 def inRect(bottom_left, top_right, point):
@@ -118,4 +122,4 @@ def init():
         "7": (402, 482) 
     }
 
-    last_point = None
+    last_point = (327, 448)
