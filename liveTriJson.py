@@ -73,6 +73,7 @@ def get_location(
 def recieve_anchors(data: dict) -> int:
     # Expect data = {distances: [distance, ...]}
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
+    print(data)
     uwb_data = { str(i): d for (i, d) in enumerate(data) if d >= 0 }
     for ix, distance in enumerate(data["distances"]):
         uwb_data[ix] = distance * 0.03280841666667
