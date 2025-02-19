@@ -121,13 +121,17 @@ def read_packet():
     print(f"Tag {tag}")
 
     if tag == 1:  # AnchorDistances: { f32 distances[NUM_ANCHORS]; }
-        payload = globals.ser.read(4 * constvars.NUM_ANCHORS)
-        if len(payload) < 4 * constvars.NUM_ANCHORS:
-            return None
-        distances = struct.unpack('<' + 'f' * constvars.NUM_ANCHORS, payload)
-        handle_anchor_distances(distances)
-        return {'tag': 'AnchorDistances', 'distances': distances}
-    
+        if globals.timer >= constvars.ANCHOR_READ_TIMER:
+            globals.timer = 0
+            payload = globals.ser.read(4 * constvars.NUM_ANCHORS)
+            if len(payload) < 4 * constvars.NUM_ANCHORS:
+                return None
+            distances = struct.unpack('<' + 'f' * constvars.NUM_ANCHORS, payload)
+            handle_anchor_distances(distances)
+            print(globals.timer)
+            return {'tag': 'AnchorDistances', 'distances': distances}
+        globals.timer += 1
+
     elif tag == 4:  # RankingUpdate: { u8 positions[NUM_KARTS] }
         payload = globals.ser.read(constvars.NUM_KARTS)  # read NUM_KARTS bytes
         if len(payload) < constvars.NUM_KARTS:

@@ -11,6 +11,7 @@ global y
 global counter
 global affect_lock #prevents multiple hits
 global loc_index
+global timer
 
 ser = None
 seen_uids = set()
@@ -22,6 +23,7 @@ affect_lock = threading.Lock()
 x = 0
 y = 0
 loc_index = 0
+timer = 0
 
 def update_position(new_x, new_y, new_loc_index):
     global x, y, loc_index

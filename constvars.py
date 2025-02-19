@@ -1,6 +1,7 @@
 # Serial Port Settings
 SERIAL_PORT = '/dev/ttyACM0'  # or '/dev/serial0' on a Raspberry Pi
 BAUD_RATE = 115200
+ANCHOR_READ_TIMER = 10
 
 # Define constants
 NUM_ANCHORS = 2   # for AnchorDistances
