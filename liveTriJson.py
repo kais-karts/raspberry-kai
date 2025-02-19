@@ -33,9 +33,11 @@ def get_location(
         track_intersection_points = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
 
         if not track_intersection_points:
+            print("Not enough intersection points to compute location")
             return last_point
 
         if last_point is None:
+            print("Last point is none")
             return track_intersection_points[0]
 
         # Find the closest intersection point to last_point
@@ -52,6 +54,7 @@ def get_location(
                 track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
+            print("Not enough intersection points to compute location")
             return None  # Not enough intersection points to compute location
 
         all_combinations = np.array(list(product(*track_intersection_points)))  # All possible combinations
@@ -81,7 +84,7 @@ def recieve_anchors(data: dict) -> int:
         uwb_data[beacon] *= 0.03280841666667
     print(uwb_data)
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
-    print(location)
+    print(f"this is loc: {location})
     # start and end track index and location
     if location == None:
         location = last_point
@@ -121,4 +124,4 @@ def init():
         "7": (402, 482) 
     }
 
-    last_point = (327, 448)
+    last_point = None
