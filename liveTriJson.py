@@ -9,6 +9,7 @@ from constvars import *
 def circle_intersection(point: Tuple[int, int], radius: float, track_set: set) -> List[Tuple[int, int]]:
     """Find intersection points of a circle centered at 'point' with 'track'."""
     angles = np.linspace(0, 2 * np.pi, int(abs(radius * 8)))
+    print(point)
     x_points = np.round(point[1] + radius * np.cos(angles)).astype(int)
     y_points = np.round(point[0] + radius * np.sin(angles)).astype(int)
     circle_points = set(zip(x_points, y_points))
@@ -25,17 +26,16 @@ def get_location(
     beacons: Dict[str, Tuple[int, int]],
 ) -> Optional[Tuple[int, int]]:
     """Estimate the location based on beacon distances."""
-    # print(f"Getting Locations: {close_beacons}")
     if len(close_beacons) == 1:
         beacon_name = next(iter(close_beacons))  # Get the single beacon name
         beacon_position = beacons[beacon_name]
         track_intersection_points = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
 
-        if last_point is None:
-            return track_intersection_points[0]
-        
         if not track_intersection_points:
             return last_point
+
+        if last_point is None:
+            return track_intersection_points[0]
 
         # Find the closest intersection point to last_point
         best_point = min(track_intersection_points, key=lambda p: np.linalg.norm(np.array(p) - np.array(last_point)))
@@ -44,18 +44,18 @@ def get_location(
     else:
         track_intersection_points = []
         for beacon_name in close_beacons:
-            if beacon_name in BEACONS:
-                beacon_position = beacons[beacon_name]
-                intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
-                if intersections:
-                    # print(f"Intersection point at {intersections}")
-                    track_intersection_points.append(intersections)
+            beacon_position = beacons[beacon_name]
+            intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
+            if intersections:
+                track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
-            # print("Not enough intersection points to compute location")
-            return last_point  # Not enough intersection points to compute location
+            return None  # Not enough intersection points to compute location
 
         all_combinations = np.array(list(product(*track_intersection_points)))  # All possible combinations
+
+        if all_combinations.size == 0:
+            return None
 
         # Compute pairwise distances for each set
         diffs = all_combinations[:, :, np.newaxis, :] - all_combinations[:, np.newaxis, :, :]
@@ -73,14 +73,13 @@ def get_location(
 def recieve_anchors(data: dict) -> int:
     # Expect data = {distances: [distance, ...]}
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
-    uwb_data = dict()
-    # Convert distances from cm to feet
+    uwb_data = { str(i): d for (i, d) in enumerate(data) if d >= 0 }
     for ix, distance in enumerate(data["distances"]):
-        uwb_data[str(ix)] = distance * 0.03280841666667
+        uwb_data[ix] = distance * 0.03280841666667
 
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     last_point = location
-    # print(f"Location: {location}")
+    print(location)
     # start and end track index and location
     if inRect((600,0), (435, 77), location) or inRect((547,77), (435, 236), location):
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
@@ -98,20 +97,14 @@ def init():
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
     TRACK_LIST = pickle.load(open('mainTrack.pkl', 'rb'))
     TRACK_SET = pickle.load(open('totalTrack.pkl', 'rb'))  # Create the set for fast lookup
-    BRANCH_INFO = {"start_pos": (593,67), "start_idx": 1524, "end_pos": (481,246), "end_idx": 1870}
+    BRANCH_INFO = {"start_pos": (592,67), "start_idx": 1524, "end_pos": (481,246), "end_idx": 1870}
     BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
+
     # Define beacons location
     BEACONS = {
-        "0": (448, 327),
-        "1": (559, 441),
-        "2": (622, 207),
-        "3": (622, 90),
-        "4": (523, 12),
-        "5": (424, 129),
-        "6": (424, 246),
-        "7": (482, 402) 
+        "0": (200, 27),  # y, x top left IN FOOT
+        "1": (300, 30),  # mid
+        "Beacon 3": (500, 27)   # left
     }
 
-    # START: (448, 327)
-
-    last_point = (593, 67)
+    last_point = None
