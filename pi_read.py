@@ -7,7 +7,7 @@ from gpio_logic import light_button, reset_button
 import utils
 import random
 import asyncio
-from ui_comms import item_pickup, item_hit, item_use, players_update, send_debuff, use_buff
+from ui_comms import item_pickup, item_hit, players_update, send_debuff, use_buff
 
 
 def handle_anchor_distances(data):
