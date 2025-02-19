@@ -59,7 +59,7 @@ async def item_hit(item: int, duration: int) -> None:
 
     msg = json.dumps({
         "action": "item_hit",
-        "item": item
+        "item": item,
         "duration": duration,
     })
     await websocket_conn.send(msg)
