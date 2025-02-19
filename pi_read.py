@@ -41,7 +41,8 @@ def handle_get_item(data):
     kart_id = data['to']
     uid = data['uid']
     if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
-        globals.kart_item = utils.draw_item(globals.kart_rank)
+        # globals.kart_item = utils.draw_item(globals.kart_rank)
+        globals.kart_item = uid % 10
         globals.seen_uids.add(uid)
         light_button()
         x, y, loc_index= globals.get_position()
