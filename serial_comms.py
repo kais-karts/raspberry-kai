@@ -1,7 +1,7 @@
 from logging import getLogger
 import serial
 import constvars
-from pi_read import read_packet, init_send, tests, use_item
+from pi_read import read_packet, init_send, use_item
 import liveTriJson as tri
 import globals
 import gpio_logic as io
