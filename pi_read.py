@@ -36,8 +36,8 @@ def handle_ranking_update(data):
         asyncio.run(players_update([
             {
                 "id": kart_id,
-                "x": x,
-                "y": y,
+                "x":int(x),
+                "y": int(y),
                 "rank": rank
             }
             for rank, kart_id in enumerate(rankings)

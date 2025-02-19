@@ -28,39 +28,37 @@ def get_location(
     """Estimate the location based on beacon distances."""
     if len(close_beacons) == 1:
         beacon_name = next(iter(close_beacons))  # Get the single beacon name
-        print(beacon_name)
         beacon_position = beacons[beacon_name]
         track_intersection_points = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
 
         if not track_intersection_points:
-            print("Not enough intersection points to compute location")
             return last_point
 
         if last_point is None:
-            print("Last point is none")
             return track_intersection_points[0]
 
         # Find the closest intersection point to last_point
         best_point = min(track_intersection_points, key=lambda p: np.linalg.norm(np.array(p) - np.array(last_point)))
+        if np.linalg.norm(np.array(last_point) - np.array(best_point)) > 40:
+            return last_point
+        
         return best_point
 
     else:
         track_intersection_points = []
         for beacon_name in close_beacons:
-            print(f"beacon name : {beacon_name}, beacons: {beacons}")
             beacon_position = beacons[beacon_name]
             intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
             if intersections:
                 track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
-            print("Not enough intersection points to compute location")
-            return None  # Not enough intersection points to compute location
+            return last_point  # Not enough intersection points to compute location
 
         all_combinations = np.array(list(product(*track_intersection_points)))  # All possible combinations
 
         if all_combinations.size == 0:
-            return None
+            return last_point 
 
         # Compute pairwise distances for each set
         diffs = all_combinations[:, :, np.newaxis, :] - all_combinations[:, np.newaxis, :, :]
@@ -72,8 +70,14 @@ def get_location(
         # Find the best set with minimum total distance
         best_idx = np.argmin(total_dists)
         best_set = all_combinations[best_idx]
-        location = tuple(np.mean(best_set, axis=0).astype(int))  # Compute average location
+
+        # **Select the point in the best set closest to last_point**
+        distances_to_last = np.linalg.norm(best_set - np.array(last_point), axis=1)
+        best_point = best_set[np.argmin(distances_to_last)]  # Pick the closest point
+        location = tuple(best_point.astype(int))  # Compute average location
+
         return location
+
     
 def recieve_anchors(data: dict) -> int:
     # Expect data = {distances: [distance, ...]}
