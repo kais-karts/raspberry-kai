@@ -98,17 +98,17 @@ async def players_update(rank_data) -> None:
     """
     Updates the UI with the rank data of every player
     """
-    # if websocket_conn is None:
-    #     print("No active websocket connection.")
-    #     return
+    if websocket_conn is None:
+        print("No active websocket connection.")
+        return
 
-    # msg = json.dumps({
-    #     "action": "players_update",
-    #     "player_status": rank_data
-    # })
-    # await websocket_conn.send(msg)
-    # print(f"Sent players_update: {msg}")
-    print(f"Mock sent players_update: {rank_data}")
+    msg = json.dumps({
+        "action": "players_update",
+        "player_status": rank_data
+    })
+    await websocket_conn.send(msg)
+    print(f"Sent players_update: {msg}")
+    # print(f"Mock sent players_update: {rank_data}")
 
 async def hello(websocket, path):
     global websocket_conn
