@@ -23,18 +23,26 @@ def handle_anchor_distances(data):
 
 def handle_ranking_update(data):
     print("RankingUpdate:", data)
-    positions = data['positions']
-    if constvars.KART_ID in data['positions']:
-        globals.kart_rank = data['positions'].index(constvars.KART_ID) + 1
+    rankings = data['positions']
+    if constvars.KART_ID in rankings:
+        x, y = globals.get_position()
+        globals.kart_rank = rankings.index(constvars.KART_ID) + 1
+        # sends update to ui in the form of a list of dictionaries for each kart
+        players_update([
+            {
+                "id": kart_id,
+                "x": x,
+                "y": y,
+                "rank": rank
+            }
+            for rank, kart_id in enumerate(rankings)
+            if kart_id != 0 # this is a holder in rankings - does not represent a player
+        ])
     else:
-        globals.kart_rank = len(data['positions']) + 1
-        positions.append(constvars.KART_ID)
-    # was for debugging
-    # if globals.counter == None:
-    #     globals.counter = 0
-    # init_send(globals.counter)
-    # globals.counter += 1
-    return
+        # Happens when server initializes after client initializes
+        # Wont occur intentionally but will just initialze kart
+        x, y, loc_index = globals.get_position()
+        write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
 
 def handle_get_item(data):
     print("GetItem:", data)
