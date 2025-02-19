@@ -84,7 +84,7 @@ def recieve_anchors(data: dict) -> int:
         uwb_data[beacon] *= 0.03280841666667
     print(uwb_data)
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
-    print(f"this is loc: {location})
+    print(f"this is loc: {location}")
     # start and end track index and location
     if location == None:
         location = last_point
