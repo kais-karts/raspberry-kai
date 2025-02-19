@@ -17,7 +17,7 @@ def handle_anchor_distances(data):
     loc, loc_index = recieve_anchors({'distances': data})
     print(f"Location: {loc}")
     print(f"Location Index: {loc_index}")
-    # x, y, loc_index = globals.get_position()
+    x, y, loc_index = globals.get_position()
     # x += 1
     # y += 1
     # loc_index += 1

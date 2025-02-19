@@ -109,8 +109,8 @@ def init():
     # Load image and track data
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
 
-    TRACK_LIST = pickle.load(open('mainTrackREORDER.pkl', 'rb'))
-    TRACK_SET = pickle.load(open('totalTrackFINAL.pkl', 'rb'))  # Create the set for fast lookup
+    TRACK_LIST = pickle.load(open('mainTrackRed.pkl', 'rb'))
+    TRACK_SET = pickle.load(open('totalTrackFin.pkl', 'rb'))  # Create the set for fast lookup
     BRANCH_INFO = {"start_pos": (616,86), "start_idx": 1534, "end_pos": (504,265), "end_idx": 1869}
     BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
     
@@ -132,4 +132,4 @@ def init():
         "13": (547, 304)
     }
 
-    last_point = (448, 327)
+    last_point = (593, 340)
