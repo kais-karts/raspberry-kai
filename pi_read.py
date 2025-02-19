@@ -14,13 +14,15 @@ def handle_anchor_distances(data):
     ''' 
     Takes in distances to each anchor and returns the location index
     '''
-    loc, loc_index = recieve_anchors({'distances': data})
-    print(f"Location: {loc}")
-    print(f"Location Index: {loc_index}")
-    x, y = loc
-    globals.update_position(x, y, loc_index)
+    # loc, loc_index = recieve_anchors({'distances': data})
+    # print(f"Location: {loc}")
+    # print(f"Location Index: {loc_index}")
+    x, y, loc_index = globals.get_position()
+    x += 1
+    y += 1
+    loc_index += 1
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
-    return
+    globals.update_position(x, y, loc_index)
 
 def handle_ranking_update(data):
     print("RankingUpdate:", data)
@@ -107,8 +109,9 @@ def write_packet(packet):
     # globals.ser.write(packet)
     globals.ser.flush()
 
-def init_send(test: int = 0):
-    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, , 0))
+def init_send():
+    # handle on server side
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, 0, 0))
 
 def read_packet():
 # look for magic number
