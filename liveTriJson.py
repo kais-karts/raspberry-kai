@@ -96,19 +96,16 @@ def inRect(bottom_left, top_right, point):
 def init():
     # Load image and track data
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
-    TRACK_LIST = pickle.load(open('mainTrack.pkl', 'rb'))
-    TRACK_SET = pickle.load(open('totalTrack.pkl', 'rb'))  # Create the set for fast lookup
-
 
     # Load image and track data
-    TRACK_LIST = pickle.load(open(dirname + '/mainTrack.pkl', 'rb'))
-    TRACK_SET = pickle.load(open(dirname + '/totalTrack.pkl', 'rb'))  # Create the set for fast lookup
+    TRACK_LIST = pickle.load(open('mainTrack.pkl', 'rb'))
+    TRACK_SET = pickle.load(open('totalTrack.pkl', 'rb'))  # Create the set for fast lookup
 
     BRANCH_INFO = {"start_pos": (592,67), "start_idx": 1524, "end_pos": (481,246), "end_idx": 1870}
     BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
     
     # Define beacons
-    BEACONS: Dict[str, Tuple[int, int]] = {
+    BEACONS = {
         "0": (327, 448),
         "1": (441, 559),
         "2": (207, 622),
