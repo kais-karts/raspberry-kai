@@ -7,7 +7,7 @@ from gpio_logic import light_button, reset_button
 import utils
 import random
 import asyncio
-from ui_comms import item_pickup, item_hit, item_use
+from ui_comms import item_pickup, item_hit, players_update, send_debuff, use_buff
 
 
 def handle_anchor_distances(data):
@@ -17,8 +17,8 @@ def handle_anchor_distances(data):
     print("AnchorDistances:", data)
     loc, loc_index = recieve_anchors({'distances': data})
     x, y = loc
-    globals.update_position(x, y)
-    write_packet(build_position_estimate_packet(constvars.KART_ID, x, y,loc_index))
+    globals.update_position(x, y, loc_index)
+    write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
     return
 
 def handle_ranking_update(data):
@@ -44,8 +44,8 @@ def handle_get_item(data):
         globals.kart_item = utils.draw_item(globals.kart_rank)
         globals.seen_uids.add(uid)
         light_button()
-        x, y = globals.get_position()
-        asyncio.run(item_pickup(globals.kart_item, x, y))
+        x, y, loc_index= globals.get_position()
+        asyncio.run(item_pickup(globals.kart_item))
     return
 
 def handle_do_item(data):
@@ -54,13 +54,18 @@ def handle_do_item(data):
     item = data['item']
     uid = data['uid']
     if kart_id == constvars.KART_ID and uid not in globals.seen_uids:
+        print(f"Item {item} applied to kart {constvars.KART_ID} with uid {uid}")
         globals.seen_uids.add(uid)
+        # update speed based on item
         speed_control(item)
-        x, y = globals.get_position()
+        # update ui based on item type
         if constvars.ITEMS[item] in constvars.DEBUFF_ITEMS:
-            asyncio.run(item_hit(item, x, y))
+            print(f"Hit with debuff")
+            asyncio.run(item_hit(item, constvars.ITEM_DURATION[item]))
         elif constvars.ITEMS[item] in constvars.BUFF_ITEMS:
-            asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
+            print(f"Buff activate")
+            # TODO: THIS IS FOR TESTING PURPOSES ONLY, WE NO LONGER DO ITEM FOR BUFFS
+            asyncio.run(use_buff(item, constvars.ITEM_DURATION[item]))
         else:
             print("DoItem: Unknown item type")
     return
@@ -71,13 +76,14 @@ def use_item(channel):
     globals.kart_item = None
     if item is not None:
         uid = random.getrandbits(32)
-        print(f"Kart {constvars.KART_ID}, item {item}, uid {uid}")
-        x, y = globals.get_position()
+        print(f"Kart {constvars.KART_ID} used item {item} with uid {uid}")
         if constvars.ITEMS[item] in constvars.BUFF_ITEMS:
+            print(f"Buff activate")
             speed_control(item)
-            asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
+            asyncio.run(use_buff(item, constvars.ITEM_DURATION[item]))
         else:
-            asyncio.run(item_use(constvars.ITEM_DURATION[item], x, y))
+            print(f"Send debuff")
+            asyncio.run(send_debuff())
             write_packet(build_use_item_packet(constvars.KART_ID, item, uid))
         reset_button()
 
@@ -126,7 +132,7 @@ def read_packet():
         payload = globals.ser.read(constvars.NUM_KARTS)  # read NUM_KARTS bytes
         if len(payload) < constvars.NUM_KARTS:
             return None
-        positions = struct.unpack('>' + 'B' * constvars.NUM_KARTS, payload)
+        positions = struct.unpack('<' + 'B' * constvars.NUM_KARTS, payload)
         handle_ranking_update({'positions': positions})
         return {'tag': 'RankingUpdate', 'positions': positions}
     

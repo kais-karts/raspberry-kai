@@ -84,7 +84,7 @@ def recieve_anchors(data: dict) -> int:
     else:
         location_index = TRACK_LIST.index(location)
 
-    return location, location_index
+    return location, locaion_index
 
 def inRect(bottom_left, top_right, point):
     return bottom_left[0] <= point[0] <= top_right[0] and bottom_left[1] <= point[1] <= top_right[1] 

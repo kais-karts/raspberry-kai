@@ -32,7 +32,7 @@ async def handle_communication(websocket):
         await websocket_conn.send(message)
 
 # Now define the item functions as async functions.
-async def item_pickup(item: int, x, y) -> None:
+async def item_pickup(item: int) -> None:
     """
     Updates the UI when a new item is picked up by sending a message over the websocket.
     """
@@ -44,13 +44,11 @@ async def item_pickup(item: int, x, y) -> None:
     msg = json.dumps({
         "action": "item_pickup",
         "item": item,
-        "x": x,
-        "y": y
     })
     await websocket_conn.send(msg)
     print(f"Sent item_pickup: {msg}")
 
-async def item_hit(item: int,  x, y) -> None:
+async def item_hit(item: int, duration: int) -> None:
     """
     Updates the UI when the player is hit with an item.
     """
@@ -60,32 +58,55 @@ async def item_hit(item: int,  x, y) -> None:
 
     msg = json.dumps({
         "action": "item_hit",
-        "item": item,
-        "x": x,
-        "y": y
+        "duration": duration,
     })
     await websocket_conn.send(msg)
     print(f"Sent item_hit: {msg}")
 
-async def item_use(duration: float, x, y) -> None:
+async def use_buff(item: int, duration: int) -> None:
     """
-    Updates the UI when the player uses an item.
+    Updates the UI when the player uses a buff item
     """
     if websocket_conn is None:
         print("No active websocket connection.")
         return
 
     msg = json.dumps({
-        "action": "item_use",
-        "duration": duration,
-        "x": x,
-        "y": y
+        "action": "use_buff",
+        "item": item,
+        "duration": duration
     })
     await websocket_conn.send(msg)
+
     print(f"Sent item_use: {msg}")
 
+async def send_debuff() -> None:
+    """
+    Updates the UI when the player uses a debuff item
+    """
+    if websocket_conn is None:
+        print("No active websocket connection.")
+        return
+    msg = json.dumps({
+        "action": "send_debuff",
+    })
+    await websocket_conn.send(msg)
+    print(f"Sent send_debuff: {msg}")
 
+async def players_update(rank_data) -> None:
+    """
+    Updates the UI with the rank data of every player
+    """
+    if websocket_conn is None:
+        print("No active websocket connection.")
+        return
 
+    msg = json.dumps({
+        "action": "players_update",
+        "player_status": rank_data
+    })
+    await websocket_conn.send(msg)
+    print(f"Sent players_update: {msg}")
 
 async def hello(websocket, path):
     global websocket_conn
