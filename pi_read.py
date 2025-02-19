@@ -14,7 +14,6 @@ def handle_anchor_distances(data):
     ''' 
     Takes in distances to each anchor and returns the location index
     '''
-    # print("AnchorDistances:", data)
     loc, loc_index = recieve_anchors({'distances': data})
     print(f"Location: {loc}")
     print(f"Location Index: {loc_index}")
@@ -27,7 +26,6 @@ def handle_ranking_update(data):
     print("RankingUpdate:", data)
     rankings = data['positions']
     if constvars.KART_ID in rankings:
-        print("should update players here")
         x, y, loc_index = globals.get_position()
         globals.kart_rank = rankings.index(constvars.KART_ID) + 1
         # sends rankings and x, y positions of kart
@@ -143,7 +141,6 @@ def read_packet():
             distances = struct.unpack('<' + 'f' * constvars.NUM_ANCHORS, payload)
             handle_anchor_distances(distances)
             print(globals.timer)
-            print(f"COUNTER: {globals.counter}")
             globals.counter += 1
             return {'tag': 'AnchorDistances', 'distances': distances}
         globals.timer += 1
@@ -187,7 +184,6 @@ def build_packet(tag, payload_bytes):
 
 def build_position_estimate_packet(from_val, x, y, loc_index):
     # tag 2
-    print("SENDING POSITION ESTIMATE")
     payload = struct.pack('<IIII', from_val, x, y, loc_index)
     return build_packet(2, payload)
 
@@ -195,26 +191,5 @@ def build_use_item_packet(from_val, item, uid):
     # tag 3
     payload = struct.pack('<III', from_val, item, uid)
     return build_packet(3, payload)
-
-
-def tests():
-    def test_anchor_distances():
-        print("Testing AnchorDistances packet")
-        handle_anchor_distances([1.0, 2.0, 3.0])
-        print("Sent AnchorDistances packet")
-    
-    def test_ranking_update():
-        print("Testing RankingUpdate packet")
-        handle_ranking_update({'positions': [1, 2, 3, 4, 5, 6]})
-        print("Sent RankingUpdate packet")
-
-    def test_do_item():
-        print("Testing DoItem packet")
-        handle_do_item({'to': 1, 'item': 2, 'uid': 3})
-        print("Sent DoItem packet")
-
-    test_anchor_distances()
-    test_ranking_update()
-    test_do_item()
 
     
