@@ -14,14 +14,14 @@ def handle_anchor_distances(data):
     ''' 
     Takes in distances to each anchor and returns the location index
     '''
-    # loc, loc_index = recieve_anchors({'distances': data})
-    # print(f"Location: {loc}")
-    # print(f"Location Index: {loc_index}")
-    x, y, loc_index = globals.get_position()
-    x += 1
-    y += 1
-    loc_index += 1
-    print(f"INDEX: {x}")
+    loc, loc_index = recieve_anchors({'distances': data})
+    print(f"Location: {loc}")
+    print(f"Location Index: {loc_index}")
+    # x, y, loc_index = globals.get_position()
+    # x += 1
+    # y += 1
+    # loc_index += 1
+    # print(f"INDEX: {x}")
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
     globals.update_position(x, y, loc_index)
 
