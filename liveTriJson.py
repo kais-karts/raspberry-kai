@@ -77,8 +77,8 @@ def recieve_anchors(data: dict) -> int:
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
     print(data)
     uwb_data = { str(i): d for (i, d) in enumerate(data["distances"]) if d >= 0 }
-    for ix, distance in enumerate(data["distances"]):
-        uwb_data[ix] = distance * 0.03280841666667
+    for beacon in uwb_data:
+        uwb_data[beacon] *= 0.03280841666667
     print(uwb_data)
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     last_point = location
