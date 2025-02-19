@@ -25,6 +25,7 @@ def get_location(
     beacons: Dict[str, Tuple[int, int]],
 ) -> Optional[Tuple[int, int]]:
     """Estimate the location based on beacon distances."""
+    print(f"Getting Locations: {close_beacons}")
     if len(close_beacons) == 1:
         beacon_name = next(iter(close_beacons))  # Get the single beacon name
         beacon_position = beacons[beacon_name]
@@ -46,9 +47,11 @@ def get_location(
             beacon_position = beacons[beacon_name]
             intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
             if intersections:
+                print(f"Intersection point at {intersections}")
                 track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
+            print("Not enough intersection points to compute location")
             return last_point  # Not enough intersection points to compute location
 
         all_combinations = np.array(list(product(*track_intersection_points)))  # All possible combinations
@@ -72,11 +75,11 @@ def recieve_anchors(data: dict) -> int:
     uwb_data = dict()
     # Convert distances from cm to feet
     for ix, distance in enumerate(data["distances"]):
-        uwb_data[ix] = distance * 0.03280841666667
+        uwb_data[str(ix)] = distance * 0.03280841666667
 
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     last_point = location
-    print(location)
+    print(f"Location: {location}")
     # start and end track index and location
     if inRect((600,0), (435, 77), location) or inRect((547,77), (435, 236), location):
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
@@ -84,7 +87,7 @@ def recieve_anchors(data: dict) -> int:
     else:
         location_index = TRACK_LIST.index(location)
 
-    return location, locaion_index
+    return location, location_index
 
 def inRect(bottom_left, top_right, point):
     return bottom_left[0] <= point[0] <= top_right[0] and bottom_left[1] <= point[1] <= top_right[1] 
@@ -94,14 +97,16 @@ def init():
     global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
     TRACK_LIST = pickle.load(open('mainTrack.pkl', 'rb'))
     TRACK_SET = pickle.load(open('totalTrack.pkl', 'rb'))  # Create the set for fast lookup
-    BRANCH_INFO = {"start_pos": (592,67), "start_idx": 1524, "end_pos": (481,246), "end_idx": 1870}
+    BRANCH_INFO = {"start_pos": (593,67), "start_idx": 1524, "end_pos": (481,246), "end_idx": 1870}
     BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
-
     # Define beacons location
     BEACONS = {
-        "0": (200, 27),  # y, x top left IN FOOT
-        "1": (300, 30),  # mid
-        "Beacon 3": (500, 27)   # left
+        "0": (500, 27),  # y, x top left IN FOOT
+        "1": (600, 150),  # mid
     }
 
-    last_point = None
+    print(TRACK_LIST)
+
+    # START: (448, 327)
+
+    last_point = (593, 67)
