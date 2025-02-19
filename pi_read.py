@@ -26,7 +26,7 @@ def handle_ranking_update(data):
     rankings = data['positions']
     if constvars.KART_ID in rankings:
         print("should update players here")
-        x, y = globals.get_position()
+        x, y, loc_index = globals.get_position()
         globals.kart_rank = rankings.index(constvars.KART_ID) + 1
         # sends update to ui in the form of a list of dictionaries for each kart
         print(x)
