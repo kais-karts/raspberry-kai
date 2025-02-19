@@ -14,7 +14,7 @@ def handle_anchor_distances(data):
     ''' 
     Takes in distances to each anchor and returns the location index
     '''
-    print("AnchorDistances:", data)
+    # print("AnchorDistances:", data)
     loc, loc_index = recieve_anchors({'distances': data})
     x, y = loc
     globals.update_position(x, y, loc_index)
@@ -45,7 +45,7 @@ def handle_get_item(data):
         globals.seen_uids.add(uid)
         light_button()
         x, y, loc_index= globals.get_position()
-        asyncio.run(item_pickup(globals.kart_item))
+        asyncio.run(item_pickup(globals.kart_item, "buff" if constvars.ITEMS[globals.kart_item] in constvars.BUFF_ITEMS else "debuff" ))
     return
 
 def handle_do_item(data):
@@ -84,7 +84,8 @@ def use_item(channel):
         else:
             print(f"Send debuff")
             asyncio.run(send_debuff())
-            write_packet(build_use_item_packet(constvars.KART_ID, item, uid))
+            for i in range(10):
+                write_packet(build_use_item_packet(constvars.KART_ID, item, uid))
         reset_button()
 
 
@@ -96,7 +97,8 @@ def write_packet(packet):
     globals.ser.flush()
 
 def init_send(test: int = 0):
-    write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 0))
+    for i in range(10):
+        write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 0))
 
 def read_packet():
 # look for magic number
@@ -129,6 +131,8 @@ def read_packet():
             distances = struct.unpack('<' + 'f' * constvars.NUM_ANCHORS, payload)
             handle_anchor_distances(distances)
             print(globals.timer)
+            print(f"COUNTER: {globals.counter}")
+            globals.counter += 1
             return {'tag': 'AnchorDistances', 'distances': distances}
         globals.timer += 1
 
@@ -171,6 +175,7 @@ def build_packet(tag, payload_bytes):
 
 def build_position_estimate_packet(from_val, x, y, loc_index): #TODO: UPDATE ON ESP
     # tag 2
+    print("SENDING POSITION ESTIMATE")
     payload = struct.pack('<IIII', from_val, x, y, loc_index)
     return build_packet(2, payload)
 

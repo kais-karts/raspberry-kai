@@ -32,7 +32,7 @@ async def handle_communication(websocket):
         await websocket_conn.send(message)
 
 # Now define the item functions as async functions.
-async def item_pickup(item: int) -> None:
+async def item_pickup(item: int, item_type: str) -> None:
     """
     Updates the UI when a new item is picked up by sending a message over the websocket.
     """
@@ -44,6 +44,7 @@ async def item_pickup(item: int) -> None:
     msg = json.dumps({
         "action": "item_pickup",
         "item": item,
+        "item_type": item_type
     })
     await websocket_conn.send(msg)
     print(f"Sent item_pickup: {msg}")

@@ -44,11 +44,12 @@ def get_location(
     else:
         track_intersection_points = []
         for beacon_name in close_beacons:
-            beacon_position = beacons[beacon_name]
-            intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
-            if intersections:
-                # print(f"Intersection point at {intersections}")
-                track_intersection_points.append(intersections)
+            if beacon_name in BEACONS:
+                beacon_position = beacons[beacon_name]
+                intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
+                if intersections:
+                    # print(f"Intersection point at {intersections}")
+                    track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
             # print("Not enough intersection points to compute location")
