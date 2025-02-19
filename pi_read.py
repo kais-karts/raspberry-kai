@@ -16,6 +16,8 @@ def handle_anchor_distances(data):
     '''
     # print("AnchorDistances:", data)
     loc, loc_index = recieve_anchors({'distances': data})
+    print(f"Location: {loc}")
+    print(f"Location Index: {loc_index}")
     x, y = loc
     globals.update_position(x, y, loc_index)
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
