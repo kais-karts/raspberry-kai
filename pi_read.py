@@ -29,7 +29,9 @@ def handle_ranking_update(data):
         x, y = globals.get_position()
         globals.kart_rank = rankings.index(constvars.KART_ID) + 1
         # sends update to ui in the form of a list of dictionaries for each kart
-        players_update([
+        print(x)
+        print(type(x))
+        asyncio.run(players_update([
             {
                 "id": kart_id,
                 "x": x,
@@ -38,7 +40,7 @@ def handle_ranking_update(data):
             }
             for rank, kart_id in enumerate(rankings)
             if kart_id != 0 # this is a holder in rankings - does not represent a player
-        ])
+        ]))
     else:
         # Happens when server initializes after client initializes
         # Wont occur intentionally but will just initialze kart
