@@ -124,4 +124,4 @@ def init():
         "7": (402, 482) 
     }
 
-    last_point = None
+    last_point = (448, 327)
