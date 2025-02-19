@@ -28,6 +28,7 @@ def get_location(
     """Estimate the location based on beacon distances."""
     if len(close_beacons) == 1:
         beacon_name = next(iter(close_beacons))  # Get the single beacon name
+        print(beacon_name)
         beacon_position = beacons[beacon_name]
         track_intersection_points = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
 
@@ -44,6 +45,7 @@ def get_location(
     else:
         track_intersection_points = []
         for beacon_name in close_beacons:
+            print(f"beacon name : {beacon_name}, beacons: {beacons}")
             beacon_position = beacons[beacon_name]
             intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
             if intersections:
@@ -77,7 +79,7 @@ def recieve_anchors(data: dict) -> int:
     uwb_data = { str(i): d for (i, d) in enumerate(data["distances"]) if d >= 0 }
     for ix, distance in enumerate(data["distances"]):
         uwb_data[ix] = distance * 0.03280841666667
-
+    print(uwb_data)
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     last_point = location
     print(location)
