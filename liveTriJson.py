@@ -83,11 +83,11 @@ def recieve_anchors(data: dict) -> int:
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     print(location)
     # start and end track index and location
-    if not location:
+    if location == None:
         location = last_point
     else:
         last_point = location
-    print(last_point)
+        print(f"Location is none: {last_point}")
     if inRect((600,0), (435, 77), location) or inRect((547,77), (435, 236), location):
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
         location_index = int(BRANCH_INFO["start_idx"] + (distance_to_branch_end - BRANCH_INFO["max_dist"]) * (BRANCH_INFO["end_idx"] - BRANCH_INFO["start_idx"]) / -BRANCH_INFO["max_dist"])
