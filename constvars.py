@@ -4,7 +4,7 @@ BAUD_RATE = 115200
 ANCHOR_READ_TIMER = 10
 
 # Define constants
-NUM_ANCHORS = 2   # for AnchorDistances
+NUM_ANCHORS = 16   # for AnchorDistances
 NUM_KARTS = 6     # for RankingUpdate
 
 ITEM_DURATION = [3, 10, 5, 6, 15, 10, 5, 7] # (in seconds)

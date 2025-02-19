@@ -25,7 +25,7 @@ def get_location(
     beacons: Dict[str, Tuple[int, int]],
 ) -> Optional[Tuple[int, int]]:
     """Estimate the location based on beacon distances."""
-    print(f"Getting Locations: {close_beacons}")
+    # print(f"Getting Locations: {close_beacons}")
     if len(close_beacons) == 1:
         beacon_name = next(iter(close_beacons))  # Get the single beacon name
         beacon_position = beacons[beacon_name]
@@ -47,11 +47,11 @@ def get_location(
             beacon_position = beacons[beacon_name]
             intersections = circle_intersection(beacon_position, close_beacons[beacon_name], track_set)
             if intersections:
-                print(f"Intersection point at {intersections}")
+                # print(f"Intersection point at {intersections}")
                 track_intersection_points.append(intersections)
 
         if len(track_intersection_points) < 2:
-            print("Not enough intersection points to compute location")
+            # print("Not enough intersection points to compute location")
             return last_point  # Not enough intersection points to compute location
 
         all_combinations = np.array(list(product(*track_intersection_points)))  # All possible combinations
@@ -79,7 +79,7 @@ def recieve_anchors(data: dict) -> int:
 
     location = get_location(uwb_data, TRACK_SET, last_point, BEACONS)
     last_point = location
-    print(f"Location: {location}")
+    # print(f"Location: {location}")
     # start and end track index and location
     if inRect((600,0), (435, 77), location) or inRect((547,77), (435, 236), location):
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
@@ -101,11 +101,15 @@ def init():
     BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
     # Define beacons location
     BEACONS = {
-        "0": (500, 27),  # y, x top left IN FOOT
-        "1": (600, 150),  # mid
+        "0": (448, 327),
+        "1": (559, 441),
+        "2": (622, 207),
+        "3": (622, 90),
+        "4": (523, 12),
+        "5": (424, 129),
+        "6": (424, 246),
+        "7": (482, 402) 
     }
-
-    print(TRACK_LIST)
 
     # START: (448, 327)
 

@@ -92,7 +92,7 @@ def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
     print("writing packet twice", packet)
     globals.ser.write(packet)
-    globals.ser.write(packet)
+    # globals.ser.write(packet)
     globals.ser.flush()
 
 def init_send(test: int = 0):
@@ -111,14 +111,14 @@ def read_packet():
         magic = struct.unpack('<I', maybe_magic)[0]
         if magic == constvars.PACKET_START_MAGIC:
             break  # found the packet start
-    print("Magic number found")
-    print("seen", globals.seen_uids)
+    # print("Magic number found")
+    # print("seen", globals.seen_uids)
     # Now read the tag (assume it's a 4-byte integer in little-endian)
     tag_bytes = globals.ser.read(4)
     if len(tag_bytes) < 4:
         return None
     tag = struct.unpack('<I', tag_bytes)[0]
-    print(f"Tag {tag}")
+    # print(f"Tag {tag}")
 
     if tag == 1:  # AnchorDistances: { f32 distances[NUM_ANCHORS]; }
         if globals.timer >= constvars.ANCHOR_READ_TIMER:
@@ -141,6 +141,7 @@ def read_packet():
         return {'tag': 'RankingUpdate', 'positions': positions}
     
     elif tag == 5:  # GetItem: { u32 to; u32 uid }
+        print("Get Item")
         payload = globals.ser.read(4 + 4)  # 12 bytes total
         if len(payload) < 8:
             return None
