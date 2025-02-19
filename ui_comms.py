@@ -110,6 +110,23 @@ async def players_update(rank_data) -> None:
     print(f"Sent players_update: {msg}")
     # print(f"Mock sent players_update: {rank_data}")
 
+async def player_update(rankings, x, y):
+    """
+    Updates the UI with the rankings of every plaayer and the position of the kart
+    """
+    if websocket_conn is None:
+        print("No active websocket connection.")
+        return
+
+    msg = json.dumps({
+        "action": "player_update",
+        "rankings": rankings,
+        "x": x,
+        "y": y
+    })
+    await websocket_conn.send(msg)
+    print(f"Sent player_update: {msg}")
+
 async def hello(websocket, path):
     global websocket_conn
     websocket_conn = websocket

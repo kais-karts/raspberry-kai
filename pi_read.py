@@ -7,7 +7,7 @@ from gpio_logic import light_button, reset_button
 import utils
 import random
 import asyncio
-from ui_comms import item_pickup, item_hit, players_update, send_debuff, use_buff
+from ui_comms import item_pickup, item_hit, players_update, player_update, send_debuff, use_buff
 
 
 def handle_anchor_distances(data):
@@ -30,23 +30,23 @@ def handle_ranking_update(data):
         print("should update players here")
         x, y, loc_index = globals.get_position()
         globals.kart_rank = rankings.index(constvars.KART_ID) + 1
+        # sends rankings and x, y positions of kart
+        asyncio.run(player_update(rankings, int(x), int(y)))
         # sends update to ui in the form of a list of dictionaries for each kart
-        print(x)
-        print(type(x))
-        asyncio.run(players_update([
-            {
-                "id": kart_id,
-                "x":int(x),
-                "y": int(y),
-                "rank": rank
-            }
-            for rank, kart_id in enumerate(rankings)
-            if kart_id != 0 # this is a holder in rankings - does not represent a player
-        ]))
+        # asyncio.run(players_update([
+        #     {
+        #         "id": kart_id,
+        #         "x":int(x),
+        #         "y": int(y),
+        #         "rank": rank
+        #     }
+        #     for rank, kart_id in enumerate(rankings)
+        #     if kart_id != 0 # this is a holder in rankings - does not represent a player
+        # ]))
     else:
         # Happens when server initializes after client initializes
         # Wont occur intentionally but will just initialze kart
-        print("initializing players")
+        print("initializing player")
         x, y, loc_index = globals.get_position()
         write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
 
@@ -59,7 +59,6 @@ def handle_get_item(data):
         globals.kart_item = uid % 10
         globals.seen_uids.add(uid)
         light_button()
-        x, y, loc_index= globals.get_position()
         asyncio.run(item_pickup(globals.kart_item, "buff" if constvars.ITEMS[globals.kart_item] in constvars.BUFF_ITEMS else "debuff" ))
     return
 
@@ -99,8 +98,7 @@ def use_item(channel):
         else:
             print(f"Send debuff")
             asyncio.run(send_debuff())
-            for i in range(10):
-                write_packet(build_use_item_packet(constvars.KART_ID, item, uid))
+            write_packet(build_use_item_packet(constvars.KART_ID, item, uid))
         reset_button()
 
 
@@ -112,8 +110,7 @@ def write_packet(packet):
     globals.ser.flush()
 
 def init_send(test: int = 0):
-    for i in range(10):
-        write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 0))
+    write_packet(build_position_estimate_packet(constvars.KART_ID, 0, , 0))
 
 def read_packet():
 # look for magic number
@@ -188,7 +185,7 @@ def build_packet(tag, payload_bytes):
     packet += payload_bytes
     return packet
 
-def build_position_estimate_packet(from_val, x, y, loc_index): #TODO: UPDATE ON ESP
+def build_position_estimate_packet(from_val, x, y, loc_index):
     # tag 2
     print("SENDING POSITION ESTIMATE")
     payload = struct.pack('<IIII', from_val, x, y, loc_index)
