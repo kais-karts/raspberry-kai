@@ -21,7 +21,7 @@ def handle_anchor_distances(data):
     x += 1
     y += 1
     loc_index += 1
-    print(x)
+    print(f"INDEX: {x}")
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
     globals.update_position(x, y, loc_index)
 
@@ -137,17 +137,16 @@ def read_packet():
     # print(f"Tag {tag}")
 
     if tag == 1:  # AnchorDistances: { f32 distances[NUM_ANCHORS]; }
-        if globals.timer >= constvars.ANCHOR_READ_TIMER:
-            globals.timer = 0
+        if globals.counter >= constvars.ANCHOR_READ_TIMER:
             payload = globals.ser.read(4 * constvars.NUM_ANCHORS)
             if len(payload) < 4 * constvars.NUM_ANCHORS:
                 return None
             distances = struct.unpack('<' + 'f' * constvars.NUM_ANCHORS, payload)
             handle_anchor_distances(distances)
-            print(globals.timer)
-            globals.counter += 1
+            print(globals.counter)
+            globals.counter = 0
             return {'tag': 'AnchorDistances', 'distances': distances}
-        globals.timer += 1
+        globals.counter += 1
 
     elif tag == 4:  # RankingUpdate: { u8 positions[NUM_KARTS] }
         payload = globals.ser.read(constvars.NUM_KARTS)  # read NUM_KARTS bytes
