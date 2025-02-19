@@ -29,6 +29,7 @@ def handle_ranking_update(data):
     x_positions = data['x_positions']
     y_positions = data['y_positions']
     if constvars.KART_ID in rankings:
+        print("Updating karts data")
         globals.kart_rank = rankings.index(constvars.KART_ID) + 1
         globals.rankings = rankings
         globals.position_data = {rankings[rank]: pos for rank, pos in enumerate(zip(x_positions, y_positions))}
@@ -104,12 +105,14 @@ def use_item(channel):
 
 def write_packet(packet):
     packet += bytes([0] * (constvars.PACKET_LEN_BYTES - len(packet)))
+    print(packet)
     print("writing packet twice", packet)
     globals.ser.write(packet)
     globals.ser.write(packet)
     globals.ser.flush()
 
 def init_send(test: int = 0):
+    print("INIT SEND")
     write_packet(build_position_estimate_packet(constvars.KART_ID, 1, 8, 0))
 
 def read_packet():
@@ -118,7 +121,7 @@ def read_packet():
     while True:
         # checking for timed out read
         serial_read = globals.ser.read(1)
-        # print(f"reading {serial_read}")
+        print(f"reading {serial_read}")
         if (serial_read == b''):
             return
         maybe_magic = maybe_magic[1:] + serial_read
@@ -145,12 +148,14 @@ def read_packet():
     elif tag == 4:  # RankingUpdate: { u8 positions[NUM_KARTS], u32 x_positions, u32 y_positions}
         packet_len = constvars.NUM_KARTS + (4 * constvars.NUM_KARTS) + (4 * constvars.NUM_KARTS)
         payload = globals.ser.read(packet_len)
+        print(len(payload))
+        print(packet_len)
         if len(payload) < packet_len:
             return None
         x_end = constvars.NUM_KARTS + 4 * constvars.NUM_KARTS
-        rankings = struct.unpack('>' + 'B' * constvars.NUM_KARTS, payload[:constvars.NUM_KARTS])
-        x_positions = struct.unpack('>' + 'I' * constvars.NUM_KARTS, payload[constvars.NUM_KARTS:x_end])
-        y_positions = struct.unpack('>' + 'I' * constvars.NUM_KARTS, payload[x_end:])
+        rankings = struct.unpack('<' + 'B' * constvars.NUM_KARTS, payload[:constvars.NUM_KARTS])
+        x_positions = struct.unpack('<' + 'I' * constvars.NUM_KARTS, payload[constvars.NUM_KARTS:x_end])
+        y_positions = struct.unpack('<' + 'I' * constvars.NUM_KARTS, payload[x_end:])
         handle_ranking_update({'rankings': rankings, 'x_positions': x_positions, "y_positions": y_positions})
         return {'tag': 'RankingUpdate', 'rankings': rankings, 'x_positions': x_positions, "y_positions": y_positions}
     
@@ -188,7 +193,9 @@ def build_position_estimate_packet(from_val, x, y, loc_index): #TODO: UPDATE ON 
     # u32 x;
     # u32 y;
     # u32 loc_index;
+    print(f"Building PE with from {from_val} x {x} y {y} loc_index {loc_index}")
     payload = struct.pack('<IIII', from_val, x, y, loc_index)
+    print(payload)
     return build_packet(2, payload)
 
 def build_use_item_packet(from_val, item, uid):
