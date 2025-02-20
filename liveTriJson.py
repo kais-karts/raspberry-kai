@@ -81,7 +81,7 @@ def get_location(
     
 def recieve_anchors(data: dict) -> int:
     # Expect data = {distances: [distance, ...]}
-    global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
+    global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO, last_index
     print(data)
     uwb_data = { str(i): d for (i, d) in enumerate(data["distances"]) if d >= 0 }
     for beacon in uwb_data:
@@ -99,7 +99,12 @@ def recieve_anchors(data: dict) -> int:
         distance_to_branch_end = np.linalg.norm(np.array(location) - np.array(BRANCH_INFO["end_pos"]))
         location_index = int(BRANCH_INFO["start_idx"] + (distance_to_branch_end - BRANCH_INFO["max_dist"]) * (BRANCH_INFO["end_idx"] - BRANCH_INFO["start_idx"]) / -BRANCH_INFO["max_dist"])
     else:
-        location_index = TRACK_LIST.index(location)
+        try:
+            location_index = TRACK_LIST.index(location)
+        except:
+            location_index = last_index
+    last_index = location_index
+    last_point = location
     return location, location_index
 
 def inRect(bottom_left, top_right, point):
@@ -107,29 +112,29 @@ def inRect(bottom_left, top_right, point):
 
 def init():
     # Load image and track data
-    global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO
+    global TRACK_LIST, TRACK_SET, BEACONS, last_point, BRANCH_INFO, last_index
 
     TRACK_LIST = pickle.load(open('mainTrackRed.pkl', 'rb'))
     TRACK_SET = pickle.load(open('totalTrackFin.pkl', 'rb'))  # Create the set for fast lookup
     BRANCH_INFO = {"start_pos": (616,86), "start_idx": 1534, "end_pos": (504,265), "end_idx": 1869}
     BRANCH_INFO["max_dist"] = 250 # max distance on a branch to end
     
-    # Define beacons location
     BEACONS = {
-        "0": (548, 446),
-        "1": (531, 587),
-        "2": (261, 649),
-        "3": (126, 649),
-        "4": (7, 550),
-        "5": (171, 451),
-        "6": (306, 451),
-        "7": (486, 503),
-        "8": (485, 351),
-        "9": (486, 176),
-        "10": (441, 54),
-        "11": (523, 19),
-        "12": (548, 162),
-        "13": (547, 304)
+        "0": (421, 458),
+        "1": (561, 441),
+        "2": (620, 206),
+        "3": (620, 89),
+        "4": (521, 11),
+        "5": (422, 128),
+        "6": (422, 245),
+        "7": (481, 401),
+        "8": (323, 405),
+        "9": (150, 401),
+        "10": (27, 362),
+        "11": (0, 441),
+        "12": (134, 458),
+        "13": (277, 458)
     }
 
-    last_point = (593, 340)
+    last_point = (504, 265)
+    last_index = TRACK_LIST.index(last_point)
