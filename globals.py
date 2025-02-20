@@ -12,6 +12,7 @@ global counter
 global affect_lock #prevents multiple hits
 global loc_index
 global timer
+global last_index
 
 ser = None
 seen_uids = set()
