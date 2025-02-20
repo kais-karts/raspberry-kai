@@ -23,6 +23,7 @@ def handle_anchor_distances(data):
     # loc_index += 1
     # print(f"INDEX: {x}")
     write_packet(build_position_estimate_packet(constvars.KART_ID, x, y, loc_index))
+    print(F"X: {x}, Y: {y},loc_index: {loc_index}")
     globals.update_position(x, y, loc_index)
 
 def handle_ranking_update(data):
